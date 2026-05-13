@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
 
-import DashboardLayout from "./features/dashboard/DashboardLayout";
+import AppLayout from "./components/layout/AppLayout";
 import Projects from "./features/dashboard/Projects";
 import ProjectDetail from "./features/dashboard/ProjectDetail";
 import Settings from "./features/dashboard/Settings";
@@ -16,7 +16,7 @@ function App() {
     ...authRoutes,
     {
       path: "/dashboard",
-      element: <DashboardLayout />,
+      element: <AppLayout />,
       children: [
         { index: true, element: <Projects /> },
         { path: "projects", element: <Projects /> },

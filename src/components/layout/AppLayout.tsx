@@ -1,13 +1,18 @@
 import { useState } from "react";
 import { Link, NavLink, Outlet } from "react-router";
-import { IconFolder, IconSettings, IconLogout, IconMenu2 } from "@tabler/icons-react";
+import {
+  IconFolder,
+  IconSettings,
+  IconLogout,
+  IconMenu2,
+} from "@tabler/icons-react";
 
 const navItems = [
   { to: "/dashboard/projects", label: "Projects", icon: IconFolder },
   { to: "/dashboard/settings", label: "Settings", icon: IconSettings },
 ];
 
-export default function DashboardLayout() {
+export default function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
@@ -27,7 +32,10 @@ export default function DashboardLayout() {
         }`}
       >
         <div className="flex h-16 items-center gap-2 px-6">
-          <Link to="/dashboard/projects" className="text-xl font-bold text-white">
+          <Link
+            to="/dashboard/projects"
+            className="text-xl font-bold text-white"
+          >
             EnvMemo
           </Link>
         </div>
@@ -93,5 +101,3 @@ export default function DashboardLayout() {
     </div>
   );
 }
-
-

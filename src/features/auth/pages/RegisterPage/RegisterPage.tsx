@@ -2,7 +2,7 @@ import { Link } from "react-router";
 import { Form, Formik } from "formik";
 import * as Yup from "yup";
 
-import AuthLayout from "@/components/AuthLayout";
+import AuthLayout from "@/components/layout/AuthLayout";
 import { InputField } from "@/components/form/InputField";
 
 import type { RegisterPageProps } from "./interface";

@@ -3,7 +3,7 @@ import { Form, Formik } from "formik";
 import * as Yup from "yup";
 
 import { InputField } from "@/components/form/InputField";
-import AuthLayout from "@/components/AuthLayout";
+import AuthLayout from "@/components/layout/AuthLayout";
 
 import type { LoginPageProps } from "./interface";
 

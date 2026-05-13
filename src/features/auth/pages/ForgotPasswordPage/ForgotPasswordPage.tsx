@@ -3,7 +3,7 @@ import { Form, Formik } from "formik";
 import * as Yup from "yup";
 import { IconMail } from "@tabler/icons-react";
 
-import AuthLayout from "@/components/AuthLayout";
+import AuthLayout from "@/components/layout/AuthLayout";
 import { InputField } from "@/components/form/InputField";
 
 import type { ForgotPasswordPageProps } from "./interface";
