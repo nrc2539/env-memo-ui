@@ -58,7 +58,7 @@ export default function ForgotPasswordPage({
         onSubmit={onSubmit}
       >
         {({ isSubmitting }) => (
-          <Form className="mt-8 space-y-6">
+          <Form className="mt-8 space-y-4">
             <InputField
               name="email"
               label="Email address"

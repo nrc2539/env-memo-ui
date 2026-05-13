@@ -33,7 +33,7 @@ export default function RegisterPage({
       >
         {({ isSubmitting }) => (
           <Form className="mt-8 space-y-6">
-            <div className="space-y-4">
+            <div className="space-y-1">
               <InputField
                 name="name"
                 label="Full name"

@@ -7,7 +7,7 @@ export function ErrorMessage({ className, text }: ErrorMessageProps) {
   return (
     <div
       className={cn(
-        "grid grid-cols-[16px_1fr] gap-1 items-start mt-1",
+        "grid grid-cols-[16px_1fr] gap-1 items-start mt-1 h-5",
         className,
       )}
     >

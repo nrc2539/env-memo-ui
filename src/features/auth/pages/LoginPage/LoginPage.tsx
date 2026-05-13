@@ -26,7 +26,7 @@ export default function LoginPage({ initialValues, onSubmit }: LoginPageProps) {
       >
         {({ isSubmitting }) => (
           <Form className="mt-8 space-y-6">
-            <div className="space-y-4">
+            <div className="space-y-1">
               <InputField
                 name="email"
                 label="Email address"
