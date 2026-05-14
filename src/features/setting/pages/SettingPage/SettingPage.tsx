@@ -1,19 +1,25 @@
+import { Form, Formik } from "formik";
+import * as Yup from "yup";
+
+import { InputField } from "@/components/form/InputField";
+import { passwordRegx } from "@/libs/constant";
+
 import type { SettingPageProps } from "./interface";
 
+const validationSchema = Yup.object({
+  currentPassword: Yup.string().required("Current password is required"),
+  newPassword: Yup.string()
+    .matches(passwordRegx, "Min 10 characters, 1 letter, 1 special character")
+    .required("New password is required"),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref("newPassword")], "Passwords must match")
+    .required("Please confirm your password"),
+});
+
 export default function SettingPage({
-  currentPassword,
-  newPassword,
-  confirmPassword,
-  onCurrentPasswordChange,
-  onNewPasswordChange,
-  onConfirmPasswordChange,
+  initialValues,
   onSubmit,
 }: SettingPageProps) {
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit?.();
-  };
-
   return (
     <div className="mx-auto max-w-2xl">
       <h1 className="mb-6 text-2xl font-semibold text-gray-900">Settings</h1>
@@ -24,73 +30,46 @@ export default function SettingPage({
           Ensure your account is secure by using a strong password.
         </p>
 
-        <form onSubmit={handleSubmit} className="mt-6 space-y-5">
-          <div>
-            <label
-              htmlFor="current-password"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Current password
-            </label>
-            <input
-              id="current-password"
-              type="password"
-              autoComplete="current-password"
-              required
-              value={currentPassword}
-              onChange={(e) => onCurrentPasswordChange?.(e.target.value)}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 placeholder-gray-400 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-              placeholder="Enter current password"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="new-password"
-              className="block text-sm font-medium text-gray-700"
-            >
-              New password
-            </label>
-            <input
-              id="new-password"
-              type="password"
-              autoComplete="new-password"
-              required
-              value={newPassword}
-              onChange={(e) => onNewPasswordChange?.(e.target.value)}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 placeholder-gray-400 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-              placeholder="Enter new password"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="confirm-password"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Confirm new password
-            </label>
-            <input
-              id="confirm-password"
-              type="password"
-              autoComplete="new-password"
-              required
-              value={confirmPassword}
-              onChange={(e) => onConfirmPasswordChange?.(e.target.value)}
-              className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 placeholder-gray-400 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
-              placeholder="Confirm new password"
-            />
-          </div>
-
-          <div className="flex justify-end pt-2">
-            <button
-              type="submit"
-              className="rounded-lg bg-teal-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/40"
-            >
-              Update password
-            </button>
-          </div>
-        </form>
+        <Formik
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={onSubmit}
+        >
+          {({ isSubmitting }) => (
+            <Form className="mt-6 space-y-5">
+              <InputField
+                name="currentPassword"
+                label="Current password"
+                type="password"
+                autoComplete="current-password"
+                placeholder="Enter current password"
+              />
+              <InputField
+                name="newPassword"
+                label="New password"
+                type="password"
+                autoComplete="new-password"
+                placeholder="Enter new password"
+              />
+              <InputField
+                name="confirmPassword"
+                label="Confirm new password"
+                type="password"
+                autoComplete="new-password"
+                placeholder="Confirm new password"
+              />
+              <div className="flex justify-end pt-2">
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="rounded-lg bg-teal-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/40 disabled:opacity-50"
+                >
+                  {isSubmitting ? "Updating..." : "Update password"}
+                </button>
+              </div>
+            </Form>
+          )}
+        </Formik>
       </div>
     </div>
   );

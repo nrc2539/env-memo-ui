@@ -1,29 +1,23 @@
-import { useState } from "react";
+import type { SettingPageProps, ChangePasswordFormValues } from "./interface";
 
-import type { SettingPageProps, ChangePasswordData } from "./interface";
-
-export default function withSettingPage(Component: React.FC<SettingPageProps>) {
+export default function withSettingPage(
+  Component: React.FC<SettingPageProps>,
+) {
   function WithSettingPage() {
-    const [currentPassword, setCurrentPassword] = useState("");
-    const [newPassword, setNewPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-
-    const handleSubmit = () => {
-      const data: ChangePasswordData = { currentPassword, newPassword, confirmPassword };
-      console.log("Password change submitted:", data);
+    const initialValues: ChangePasswordFormValues = {
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
     };
 
-    const componentProps: SettingPageProps = {
-      currentPassword,
-      newPassword,
-      confirmPassword,
-      onCurrentPasswordChange: setCurrentPassword,
-      onNewPasswordChange: setNewPassword,
-      onConfirmPasswordChange: setConfirmPassword,
-      onSubmit: handleSubmit,
+    const handleSubmit = async (values: ChangePasswordFormValues) => {
+      console.log("Password change submitted:", values);
     };
 
-    return <Component {...componentProps} />;
+    return (
+      <Component initialValues={initialValues} onSubmit={handleSubmit} />
+    );
   }
+
   return WithSettingPage;
 }

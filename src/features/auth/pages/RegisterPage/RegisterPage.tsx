@@ -4,6 +4,7 @@ import * as Yup from "yup";
 
 import AuthLayout from "@/components/layout/AuthLayout";
 import { InputField } from "@/components/form/InputField";
+import { passwordRegx } from "@/libs/constant";
 
 import type { RegisterPageProps } from "./interface";
 
@@ -13,7 +14,7 @@ const validationSchema = Yup.object({
     .email("Invalid email address")
     .required("Email is required"),
   password: Yup.string()
-    .min(6, "Password must be at least 6 characters")
+    .matches(passwordRegx, "Min 10 characters, 1 letter, 1 special character")
     .required("Password is required"),
   confirmPassword: Yup.string()
     .oneOf([Yup.ref("password")], "Passwords must match")
