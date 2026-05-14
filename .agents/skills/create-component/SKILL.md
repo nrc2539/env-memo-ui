@@ -1,36 +1,43 @@
 ---
 name: create-component
-description: Create component in react
+description: Create React component following the project's component pattern
 ---
 
-## What I do
+## Component Pattern
 
-- Create `interface.ts` for:
-  - `[Name]FormValues` — form field types when using Formik
-  - `[Name]Props` — component props (e.g. `initialValues` + `onSubmit`)
-- Create `[Component].tsx` as the main component file:
-  - Contains validation schema (Yup) if it's a Formik form
-  - Render props come from `[Name]Props` interface, provided by HOC
-  - If using Formik, wrap form fields inside `<Formik>` and use an internal child component to call `useFormikContext` (never call `useFormikContext` at the top level of the component that renders `<Formik>`)
-- If component needs logic/hooks (useState, Formik, side effects), create `with[Component].tsx`:
-  - HOC factory pattern: `export default function with[Component](Component: React.FC<Props>)`
-  - Provides the props the component expects (e.g. `initialValues`, `onSubmit`)
-  - Returns the wrapped component
-- Create `index.ts` to connect HOC and view:
-  ```tsx
-  import Page from "./[Component]";
-  import withPage from "./with[Component]";
-  const Connected = withPage(Page);
-  export { Connected as [Component] };
-  ```
-- If component has no hooks/logic, skip HOC and set `[Component].tsx` as `index.tsx` (props defined in `interface.ts`)
+### With HOC (logic/hooks)
 
-## Examples in codebase
+When component needs logic (useState, useEffect, callbacks), create:
 
-- `src/features/auth/pages/LoginPage/` — Formik form with HOC factory
-- `src/components/Modal/` — Component without HOC factory
+```
+[ComponentName]/
+├── interface.ts       # Props and types
+├── [ComponentName].tsx # Pure UI view (receives props from HOC)
+├── with[ComponentName].tsx # HOC factory (business logic + UI state)
+└── index.ts           # Connect HOC to view
+```
 
-## When to use me
+Example: `example/withHOC/`
 
-Use this when you are preparing and creating react component.
-Ask clarifying questions if command is unclear.
+### Without HOC (simple component)
+
+When component is purely presentational, create:
+
+```
+[ComponentName]/
+├── interface.ts       # Props and types
+└── index.tsx          # Component view directly
+```
+
+Example: `example/withoutHOC/`
+
+## Usage
+
+1. Create component folder under appropriate feature or shared location
+2. Follow the pattern above based on whether component needs logic
+3. Props are always defined in `interface.ts`
+4. For HOC components, the HOC provides props to the view component
+
+## Reference
+
+See `example/` folder for complete template examples.
