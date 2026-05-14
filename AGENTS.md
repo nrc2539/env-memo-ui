@@ -30,6 +30,13 @@ npm run lint     # eslint .
 - Shared components live in `src/components/`, not in features
 - Entry: `src/main.tsx` → `Root.tsx` (QueryClientProvider) → `App.tsx` (RouterProvider)
 
+## Skills
+
+- `create-component` — create React components (with or without HOC)
+- `create-formik-form` — create form components using Formik + Yup validation
+
+See `.agents/skills/<skill>/SKILL.md` for detailed usage.
+
 ## API
 
 - Base URL: `VITE_API_URL` from `.env` (default `http://localhost:8080/api`)
