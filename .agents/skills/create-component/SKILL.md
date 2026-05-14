@@ -37,7 +37,8 @@ Example: `example/withoutHOC/`
 2. Follow the pattern above based on whether component needs logic
 3. Props are always defined in `interface.ts`
 4. For HOC components, the HOC provides props to the view component
-5. Do not re-export types from `index.ts` — import types directly from `interface.ts`
+5. All types (view props and wrapper/HOC props) live in `interface.ts`
+6. Do not re-export types from `index.ts` — import types directly from `interface.ts`
 
 ## Reference
 

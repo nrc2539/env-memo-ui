@@ -1,51 +1,180 @@
-import { Link } from "react-router";
+import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+import { useAlert } from "@/hooks/useAlert";
+import { Loading } from "@/components/Loading";
+import { ConfirmModal } from "@/components/ConfirmModal";
+import { useProjectAction } from "@/hooks/actions/useProjectAction";
+import { ProjectCard } from "@/features/project/components/ProjectCard";
+import { ProjectModal } from "@/features/project/components/ProjectModal";
 
 import type { ProjectListPageProps } from "./interface";
+import type { Project } from "./interface";
 
-const defaultProjects: ProjectListPageProps["projects"] = [
-  { id: 1, name: "Frontend App", envs: 12, updated: "2 hours ago", color: "bg-teal-500" },
-  { id: 2, name: "Backend API", envs: 8, updated: "1 day ago", color: "bg-blue-500" },
-  { id: 3, name: "Mobile App", envs: 6, updated: "3 days ago", color: "bg-purple-500" },
-  { id: 4, name: "Staging Config", envs: 4, updated: "1 week ago", color: "bg-amber-500" },
-  { id: 5, name: "CI/CD Pipeline", envs: 3, updated: "2 weeks ago", color: "bg-rose-500" },
-  { id: 6, name: "Analytics Service", envs: 9, updated: "3 weeks ago", color: "bg-indigo-500" },
-];
+export default function ProjectListPage({
+  projects = [],
+}: ProjectListPageProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-export default function ProjectListPage({ projects = defaultProjects }: ProjectListPageProps) {
+  const { success, error, info } = useAlert();
+  const { getProjects, createProject, updateProject, deleteProject } =
+    useProjectAction();
+  const queryClient = useQueryClient();
+
+  const { data: projectsData, isLoading } = useQuery({
+    queryKey: ["projects"],
+    queryFn: getProjects,
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (name: string) => createProject(name),
+    onSuccess: () => {
+      success({
+        message: "Create project success",
+        description: "Your project has been created.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      setIsModalOpen(false);
+    },
+    onError: () => {
+      error({
+        message: "Create project failed",
+        description: "Please try again.",
+      });
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, name }: { id: number; name: string }) =>
+      updateProject(id, name),
+    onSuccess: () => {
+      success({
+        message: "Update project success",
+        description: "Your project has been updated.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      setIsModalOpen(false);
+      setSelectedProject(null);
+    },
+    onError: () => {
+      error({
+        message: "Update project failed",
+        description: "Please try again.",
+      });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => deleteProject(id),
+    onSuccess: () => {
+      info({
+        message: "Delete project success",
+        description: "Your project has been deleted.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      setIsDeleteModalOpen(false);
+      setSelectedProject(null);
+    },
+    onError: () => {
+      error({
+        message: "Delete project failed",
+        description: "Please try again.",
+      });
+    },
+  });
+
+  const displayProjects = projectsData ?? projects;
+
+  function handleOpenCreateModal() {
+    setIsEdit(false);
+    setSelectedProject(null);
+    setIsModalOpen(true);
+  }
+
+  function handleOpenEditModal(project: Project) {
+    setIsEdit(true);
+    setSelectedProject(project);
+    setIsModalOpen(true);
+  }
+
+  function handleOpenDeleteModal(project: Project) {
+    setSelectedProject(project);
+    setIsDeleteModalOpen(true);
+  }
+
+  async function handleModalSubmit(values: { name: string }) {
+    if (isEdit && selectedProject) {
+      await updateMutation.mutateAsync({
+        id: selectedProject.id,
+        name: values.name,
+      });
+    } else {
+      await createMutation.mutateAsync(values.name);
+    }
+  }
+
+  function handleDeleteConfirm() {
+    if (selectedProject) {
+      deleteMutation.mutateAsync(selectedProject.id);
+    }
+  }
+
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-gray-900">Projects</h1>
         <button
           type="button"
+          onClick={handleOpenCreateModal}
           className="rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-500"
         >
           New Project
         </button>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {projects?.map((project) => (
-          <Link
-            key={project.id}
-            to={`/projects/${project.id}`}
-            className="block rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition hover:shadow-md"
-          >
-            <div className="flex items-center gap-3">
-              <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${project.color}`}>
-                <span className="text-sm font-bold text-white">
-                  {project.name.charAt(0)}
-                </span>
-              </div>
-              <div className="min-w-0 flex-1">
-                <h3 className="truncate text-sm font-semibold text-gray-900">{project.name}</h3>
-                <p className="text-xs text-gray-500">{project.envs} environments</p>
-              </div>
-            </div>
-            <p className="mt-4 text-xs text-gray-400">Updated {project.updated}</p>
-          </Link>
-        ))}
-      </div>
+      {isLoading ? (
+        <Loading size="lg" />
+      ) : (
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {displayProjects?.map((project) => (
+            <ProjectCard
+              key={project.id}
+              project={project}
+              onEdit={handleOpenEditModal}
+              onDelete={handleOpenDeleteModal}
+            />
+          ))}
+        </div>
+      )}
+
+      {!!selectedProject && (
+        <ProjectModal
+          isOpen={isModalOpen}
+          isEdit={isEdit}
+          initialValues={selectedProject}
+          onSubmit={handleModalSubmit}
+          onCancel={() => {
+            setIsModalOpen(false);
+            setSelectedProject(null);
+          }}
+        />
+      )}
+
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        title="Delete Project"
+        message={`Are you sure you want to delete "${selectedProject?.name}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => {
+          setIsDeleteModalOpen(false);
+          setSelectedProject(null);
+        }}
+      />
     </div>
   );
 }

@@ -23,4 +23,6 @@ export interface ProjectDetailPageProps {
   onToggleGroupAll: (group: EnvGroup) => void;
   onCopyToClipboard: (text: string, msg?: string) => Promise<void>;
   onSetPanelOpen: (open: boolean) => void;
+  onEditProject?: () => void;
+  onDeleteProject?: () => void;
 }

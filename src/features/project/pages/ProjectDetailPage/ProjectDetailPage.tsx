@@ -10,7 +10,7 @@ import {
   IconCopy,
 } from "@tabler/icons-react";
 
-import { ProjectMenu } from "@/components/ProjectMenu";
+import { ProjectMenu } from "@/features/project/components/ProjectMenu";
 
 import type { EnvVariable, ProjectDetailPageProps } from "./interface";
 
@@ -27,6 +27,8 @@ export default function ProjectDetailPage({
   onToggleGroupAll,
   onCopyToClipboard,
   onSetPanelOpen,
+  onEditProject,
+  onDeleteProject,
 }: ProjectDetailPageProps) {
   const selectedVars: EnvVariable[] = [];
   for (const group of groups) {
@@ -64,7 +66,11 @@ export default function ProjectDetailPage({
                 <h1 className="text-2xl font-semibold text-gray-900">
                   {projectName}
                 </h1>
-                <ProjectMenu />
+                <ProjectMenu
+                  project={{ id: Number(projectId), name: projectName ?? "", envs: 0, updated: "", color: "bg-teal-500" }}
+                  onEdit={() => onEditProject?.()}
+                  onDelete={() => onDeleteProject?.()}
+                />
               </div>
               <p className="mt-1 text-sm text-gray-500">
                 {groupCount} environment groups &middot; {totalVars} variables
