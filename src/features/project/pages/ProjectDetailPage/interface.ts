@@ -23,6 +23,12 @@ export interface ProjectDetailPageProps {
   onToggleGroupAll: (group: EnvGroup) => void;
   onCopyToClipboard: (text: string, msg?: string) => Promise<void>;
   onSetPanelOpen: (open: boolean) => void;
-  onEditProject?: () => void;
-  onDeleteProject?: () => void;
+  onEditProject?: (name: string) => Promise<void>;
+  onDeleteProject?: () => Promise<void>;
+  onCreateGroup?: (name: string) => Promise<void>;
+  onEditGroup?: (id: number, name: string) => Promise<void>;
+  onDeleteGroup?: (id: number) => Promise<void>;
+  onCreateVariable?: (groupId: number, key: string, value: string) => Promise<void>;
+  onEditVariable?: (id: number, key: string, value: string) => Promise<void>;
+  onDeleteVariable?: (id: number) => Promise<void>;
 }

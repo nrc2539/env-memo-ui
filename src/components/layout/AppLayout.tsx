@@ -32,10 +32,7 @@ export default function AppLayout() {
         }`}
       >
         <div className="flex h-16 items-center gap-2 px-6">
-          <Link
-            to="/projects"
-            className="text-xl font-bold text-white"
-          >
+          <Link to="/projects" className="text-xl font-bold text-white">
             EnvMemo
           </Link>
         </div>
@@ -94,7 +91,7 @@ export default function AppLayout() {
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-hidden p-6">
+        <main className="flex-1 overflow-hidden p-4 md:p-6">
           <Outlet />
         </main>
       </div>

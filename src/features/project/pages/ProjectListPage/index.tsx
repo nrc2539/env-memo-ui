@@ -150,11 +150,13 @@ export default function ProjectListPage({
         </div>
       )}
 
-      {!!selectedProject && (
+      {isModalOpen && (
         <ProjectModal
           isOpen={isModalOpen}
           isEdit={isEdit}
-          initialValues={selectedProject}
+          initialValues={
+            selectedProject ? { name: selectedProject.name } : undefined
+          }
           onSubmit={handleModalSubmit}
           onCancel={() => {
             setIsModalOpen(false);
