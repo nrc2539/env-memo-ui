@@ -1,3 +1,5 @@
+import { Role } from "@/enums/roleEnum";
+
 import type {
   EnvGroup,
   EnvVariable,
@@ -130,10 +132,16 @@ export function useProjectEnvAction() {
   async function inviteUserToProject(
     projectId: number,
     email: string,
+    role: Role,
   ): Promise<void> {
     void projectId;
     void email;
+    void role;
     await delay(500);
+  }
+
+  function getCurrentUserRole(): Role {
+    return Role.OWNER;
   }
 
   return {
@@ -145,5 +153,6 @@ export function useProjectEnvAction() {
     updateEnvVariable,
     deleteEnvVariable,
     inviteUserToProject,
+    getCurrentUserRole,
   };
 }

@@ -17,6 +17,9 @@ import { EnvVariableModal } from "@/features/project/components/EnvVariableModal
 import { EnvVariableTable } from "@/features/project/components/EnvVariableTable";
 import { VariablePreviewPanel } from "@/features/project/components/VariablePreviewPanel";
 
+import { InviteUserModal } from "@/features/project/components/InviteUserModal";
+import { getAvailableRoles, Role } from "@/enums/roleEnum";
+
 import type {
   EnvVariable,
   EnvGroup,
@@ -31,6 +34,7 @@ export default function ProjectDetailPage({
   selected,
   panelOpen,
   toast,
+  currentUserRole,
   onToggleGroup,
   onToggleVar,
   onToggleGroupAll,
@@ -44,6 +48,7 @@ export default function ProjectDetailPage({
   onCreateVariable,
   onEditVariable,
   onDeleteVariable,
+  onInviteUser,
 }: ProjectDetailPageProps) {
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [isDeleteProjectModalOpen, setIsDeleteProjectModalOpen] =
@@ -68,6 +73,10 @@ export default function ProjectDetailPage({
   const [variableToDelete, setVariableToDelete] = useState<EnvVariable | null>(
     null,
   );
+
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+
+  const isViewer = currentUserRole === Role.VIEWER;
 
   const selectedVars: EnvVariable[] = [];
   for (const group of groups) {
@@ -122,6 +131,10 @@ export default function ProjectDetailPage({
     setIsDeleteVariableModalOpen(true);
   }
 
+  function handleOpenInviteModal() {
+    setIsInviteModalOpen(true);
+  }
+
   return (
     <>
       {toast && (
@@ -145,39 +158,46 @@ export default function ProjectDetailPage({
                 <h1 className="text-2xl font-semibold text-gray-900">
                   {projectName}
                 </h1>
-                <ProjectMenu
-                  project={{
-                    id: Number(projectId),
-                    name: projectName ?? "",
-                    envs: 0,
-                    updated: "",
-                    color: "bg-teal-500",
-                  }}
-                  onEdit={handleOpenEditProject}
-                  onDelete={handleOpenDeleteProject}
-                />
+                {!isViewer && (
+                  <ProjectMenu
+                    project={{
+                      id: Number(projectId),
+                      name: projectName ?? "",
+                      envs: 0,
+                      updated: "",
+                      color: "bg-teal-500",
+                    }}
+                    onEdit={handleOpenEditProject}
+                    onDelete={handleOpenDeleteProject}
+                  />
+                )}
               </div>
               <p className="mt-1 text-sm text-gray-500">
                 {groupCount} environment groups &middot; {totalVars} variables
               </p>
             </div>
             <div className="flex gap-3">
-              <button
-                type="button"
-                className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
-              >
-                <span className="flex items-center gap-2">
-                  <IconUserPlus size={16} />
-                  Invite user
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={handleOpenCreateGroup}
-                className="rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-500"
-              >
-                Create env group
-              </button>
+              {!isViewer && (
+                <button
+                  type="button"
+                  onClick={handleOpenInviteModal}
+                  className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
+                >
+                  <span className="flex items-center gap-2">
+                    <IconUserPlus size={16} />
+                    Invite user
+                  </span>
+                </button>
+              )}
+              {!isViewer && (
+                <button
+                  type="button"
+                  onClick={handleOpenCreateGroup}
+                  className="rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-500"
+                >
+                  Create env group
+                </button>
+              )}
             </div>
           </div>
 
@@ -193,32 +213,34 @@ export default function ProjectDetailPage({
                     title={group.name}
                     badge={group.variables.length}
                     actions={
-                      <div className="flex items-center gap-1">
-                        <button
-                          type="button"
-                          onClick={() => handleOpenCreateVariable(group.id)}
-                          className="rounded-lg p-2 text-gray-400 transition hover:bg-gray-200 hover:text-gray-600"
-                          title="Add variable"
-                        >
-                          <IconPlus size={16} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleOpenEditGroup(group)}
-                          className="rounded-lg p-2 text-gray-400 transition hover:bg-gray-200 hover:text-gray-600"
-                          title="Edit group"
-                        >
-                          <IconEdit size={16} />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleOpenDeleteGroup(group)}
-                          className="rounded-lg p-2 text-gray-400 transition hover:bg-gray-200 hover:text-gray-600"
-                          title="Delete group"
-                        >
-                          <IconTrash size={16} />
-                        </button>
-                      </div>
+                      !isViewer ? (
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => handleOpenCreateVariable(group.id)}
+                            className="rounded-lg p-2 text-gray-400 transition hover:bg-gray-200 hover:text-gray-600"
+                            title="Add variable"
+                          >
+                            <IconPlus size={16} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleOpenEditGroup(group)}
+                            className="rounded-lg p-2 text-gray-400 transition hover:bg-gray-200 hover:text-gray-600"
+                            title="Edit group"
+                          >
+                            <IconEdit size={16} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleOpenDeleteGroup(group)}
+                            className="rounded-lg p-2 text-gray-400 transition hover:bg-gray-200 hover:text-gray-600"
+                            title="Delete group"
+                          >
+                            <IconTrash size={16} />
+                          </button>
+                        </div>
+                      ) : undefined
                     }
                   >
                     <EnvVariableTable
@@ -226,8 +248,8 @@ export default function ProjectDetailPage({
                       selected={selected}
                       onToggleAll={() => onToggleGroupAll(group)}
                       onToggleVar={onToggleVar}
-                      onEdit={handleOpenEditVariable}
-                      onDelete={handleOpenDeleteVariable}
+                      onEdit={!isViewer ? handleOpenEditVariable : undefined}
+                      onDelete={!isViewer ? handleOpenDeleteVariable : undefined}
                     />
                   </Accordion>
                 );
@@ -381,6 +403,20 @@ export default function ProjectDetailPage({
           setVariableToDelete(null);
         }}
       />
+
+      {isInviteModalOpen && (
+        <InviteUserModal
+          isOpen={isInviteModalOpen}
+          availableRoles={getAvailableRoles(currentUserRole)}
+          onSubmit={async (values) => {
+            if (onInviteUser) {
+              await onInviteUser(values.email, values.role as Role);
+            }
+            setIsInviteModalOpen(false);
+          }}
+          onCancel={() => setIsInviteModalOpen(false)}
+        />
+      )}
     </>
   );
 }

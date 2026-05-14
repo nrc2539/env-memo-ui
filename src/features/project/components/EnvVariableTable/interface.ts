@@ -5,6 +5,6 @@ export interface EnvVariableTableProps {
   selected?: Set<number>;
   onToggleAll: () => void;
   onToggleVar: (id: number) => void;
-  onEdit: (variable: EnvVariable) => void;
-  onDelete: (variable: EnvVariable) => void;
+  onEdit?: (variable: EnvVariable) => void;
+  onDelete?: (variable: EnvVariable) => void;
 }

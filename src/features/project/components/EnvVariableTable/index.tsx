@@ -26,7 +26,9 @@ export function EnvVariableTable({
             </th>
             <th className="px-2 sm:px-3 py-3">Key</th>
             <th className="px-2 sm:px-3 py-3">Value</th>
-            <th className="w-14 px-2 sm:px-3 py-3 text-right">Actions</th>
+            {onEdit && onDelete && (
+              <th className="w-14 px-2 sm:px-3 py-3 text-right">Actions</th>
+            )}
           </tr>
         </thead>
         <tbody>
@@ -52,26 +54,28 @@ export function EnvVariableTable({
               <td className="max-w-28 sm:max-w-50 truncate px-1.5 sm:px-3 py-3 font-mono text-sm text-gray-600 lg:max-w-xs">
                 {v.value}
               </td>
-              <td className="px-2 sm:px-3 py-3">
-                <div className="flex items-center justify-end gap-1">
-                  <button
-                    type="button"
-                    onClick={() => onEdit(v)}
-                    className="rounded-lg p-1.5 text-gray-400 transition hover:bg-gray-200 hover:text-gray-600"
-                    title="Edit variable"
-                  >
-                    <IconEdit size={16} />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => onDelete(v)}
-                    className="rounded-lg p-1.5 text-gray-400 transition hover:bg-red-100 hover:text-red-500"
-                    title="Delete variable"
-                  >
-                    <IconTrash size={16} />
-                  </button>
-                </div>
-              </td>
+              {onEdit && onDelete && (
+                <td className="px-2 sm:px-3 py-3">
+                  <div className="flex items-center justify-end gap-1">
+                    <button
+                      type="button"
+                      onClick={() => onEdit(v)}
+                      className="rounded-lg p-1.5 text-gray-400 transition hover:bg-gray-200 hover:text-gray-600"
+                      title="Edit variable"
+                    >
+                      <IconEdit size={16} />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onDelete(v)}
+                      className="rounded-lg p-1.5 text-gray-400 transition hover:bg-red-100 hover:text-red-500"
+                      title="Delete variable"
+                    >
+                      <IconTrash size={16} />
+                    </button>
+                  </div>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

@@ -1,3 +1,5 @@
+import type { Role } from "@/enums/roleEnum";
+
 export interface EnvVariable {
   id: number;
   key: string;
@@ -18,6 +20,7 @@ export interface ProjectDetailPageProps {
   selected?: Set<number>;
   panelOpen?: boolean;
   toast?: string | null;
+  currentUserRole: Role;
   onToggleGroup: (id: number) => void;
   onToggleVar: (id: number) => void;
   onToggleGroupAll: (group: EnvGroup) => void;
@@ -31,4 +34,5 @@ export interface ProjectDetailPageProps {
   onCreateVariable?: (groupId: number, key: string, value: string) => Promise<void>;
   onEditVariable?: (id: number, key: string, value: string) => Promise<void>;
   onDeleteVariable?: (id: number) => Promise<void>;
+  onInviteUser?: (email: string, role: Role) => Promise<void>;
 }

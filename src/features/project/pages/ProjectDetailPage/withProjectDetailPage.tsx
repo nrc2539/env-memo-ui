@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAlert } from "@/hooks/useAlert";
 import { useProjectAction } from "@/hooks/actions/useProjectAction";
 import { useProjectEnvAction } from "@/hooks/actions/useProjectEnvAction";
+import type { Role } from "@/enums/roleEnum";
 
 import type { ProjectDetailPageProps, EnvGroup } from "./interface";
 
@@ -25,10 +26,14 @@ export default function withProjectDetailPage(
       createEnvVariable,
       updateEnvVariable,
       deleteEnvVariable,
+      inviteUserToProject,
+      getCurrentUserRole,
     } = useProjectEnvAction();
     const alert = useAlert();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+
+    const currentUserRole = getCurrentUserRole();
 
     const [expanded, setExpanded] = useState<Set<number>>(new Set());
     const [selected, setSelected] = useState<Set<number>>(new Set());
@@ -235,6 +240,28 @@ export default function withProjectDetailPage(
       },
     });
 
+    const inviteUserMutation = useMutation({
+      mutationFn: ({
+        email,
+        role,
+      }: {
+        email: string;
+        role: string;
+      }) => inviteUserToProject(projectIdNum, email, role as Role),
+      onSuccess: () => {
+        alert.success({
+          message: "User invited",
+          description: "Invitation has been sent.",
+        });
+      },
+      onError: () => {
+        alert.error({
+          message: "Invite failed",
+          description: "Please try again.",
+        });
+      },
+    });
+
     const onCreateGroup = useCallback(
       async (name: string) => {
         await createGroupMutation.mutateAsync(name);
@@ -277,6 +304,13 @@ export default function withProjectDetailPage(
       [deleteVariableMutation],
     );
 
+    const onInviteUser = useCallback(
+      async (email: string, role: Role) => {
+        await inviteUserMutation.mutateAsync({ email, role });
+      },
+      [inviteUserMutation],
+    );
+
     const componentProps: ProjectDetailPageProps = {
       projectId,
       projectName: "Frontend App",
@@ -285,6 +319,7 @@ export default function withProjectDetailPage(
       selected,
       panelOpen,
       toast,
+      currentUserRole,
       onToggleGroup: toggleGroup,
       onToggleVar: toggleVar,
       onToggleGroupAll: toggleGroupAll,
@@ -298,6 +333,7 @@ export default function withProjectDetailPage(
       onCreateVariable,
       onEditVariable,
       onDeleteVariable,
+      onInviteUser,
     };
 
     return <Component {...componentProps} />;

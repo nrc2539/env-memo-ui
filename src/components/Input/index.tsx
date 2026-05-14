@@ -45,7 +45,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           />
         </div>
         {showError && (
-          <div className={cn(!errorMessage && "invisible")}>
+          <div className={cn({ invisible: !errorMessage })}>
             <ErrorMessage text={errorMessage || ""} />
           </div>
         )}
