@@ -1,12 +1,17 @@
-import { useState } from "react";
+import type { SettingPageProps } from "./interface";
 
-export default function Settings() {
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-
+export default function SettingPage({
+  currentPassword,
+  newPassword,
+  confirmPassword,
+  onCurrentPasswordChange,
+  onNewPasswordChange,
+  onConfirmPasswordChange,
+  onSubmit,
+}: SettingPageProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    onSubmit?.();
   };
 
   return (
@@ -33,7 +38,7 @@ export default function Settings() {
               autoComplete="current-password"
               required
               value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
+              onChange={(e) => onCurrentPasswordChange?.(e.target.value)}
               className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 placeholder-gray-400 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
               placeholder="Enter current password"
             />
@@ -52,7 +57,7 @@ export default function Settings() {
               autoComplete="new-password"
               required
               value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
+              onChange={(e) => onNewPasswordChange?.(e.target.value)}
               className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 placeholder-gray-400 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
               placeholder="Enter new password"
             />
@@ -71,7 +76,7 @@ export default function Settings() {
               autoComplete="new-password"
               required
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              onChange={(e) => onConfirmPasswordChange?.(e.target.value)}
               className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 placeholder-gray-400 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
               placeholder="Confirm new password"
             />

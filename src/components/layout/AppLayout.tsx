@@ -8,8 +8,8 @@ import {
 } from "@tabler/icons-react";
 
 const navItems = [
-  { to: "/dashboard/projects", label: "Projects", icon: IconFolder },
-  { to: "/dashboard/settings", label: "Settings", icon: IconSettings },
+  { to: "/projects", label: "Projects", icon: IconFolder },
+  { to: "/settings", label: "Settings", icon: IconSettings },
 ];
 
 export default function AppLayout() {
@@ -33,7 +33,7 @@ export default function AppLayout() {
       >
         <div className="flex h-16 items-center gap-2 px-6">
           <Link
-            to="/dashboard/projects"
+            to="/projects"
             className="text-xl font-bold text-white"
           >
             EnvMemo
