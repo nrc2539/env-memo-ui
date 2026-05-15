@@ -17,12 +17,29 @@ const validationSchema = Yup.object({
 });
 
 export default function SettingPage({
+  user,
   initialValues,
   onSubmit,
 }: SettingPageProps) {
   return (
     <div className="mx-auto max-w-2xl">
       <h1 className="mb-6 text-2xl font-semibold text-gray-900">Settings</h1>
+
+      {user && (
+        <div className="mb-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
+          <h2 className="text-lg font-semibold text-gray-900">Profile</h2>
+          <div className="mt-4 space-y-3">
+            <div>
+              <span className="text-sm font-medium text-gray-500">Name</span>
+              <p className="text-sm text-gray-900">{user.name}</p>
+            </div>
+            <div>
+              <span className="text-sm font-medium text-gray-500">Email</span>
+              <p className="text-sm text-gray-900">{user.email}</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
         <h2 className="text-lg font-semibold text-gray-900">Change password</h2>

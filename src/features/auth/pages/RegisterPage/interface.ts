@@ -7,5 +7,5 @@ export interface RegisterFormValues {
 
 export interface RegisterPageProps {
   initialValues: RegisterFormValues;
-  onSubmit: (values: RegisterFormValues) => void;
+  onSubmit: (values: RegisterFormValues) => Promise<void>;
 }

@@ -66,7 +66,7 @@ export default function ProjectDetailPage({
     null,
   );
   const [selectedVariableGroupId, setSelectedVariableGroupId] = useState<
-    number | null
+    string | null
   >(null);
   const [isDeleteVariableModalOpen, setIsDeleteVariableModalOpen] =
     useState(false);
@@ -113,7 +113,7 @@ export default function ProjectDetailPage({
     setIsDeleteGroupModalOpen(true);
   }
 
-  function handleOpenCreateVariable(groupId: number) {
+  function handleOpenCreateVariable(groupId: string) {
     setIsEditVariable(false);
     setSelectedVariable(null);
     setSelectedVariableGroupId(groupId);
@@ -163,9 +163,9 @@ export default function ProjectDetailPage({
                     project={{
                       id: Number(projectId),
                       name: projectName ?? "",
-                      envs: 0,
-                      updated: "",
-                      color: "bg-teal-500",
+                      description: null,
+                      createdAt: "",
+                      updatedAt: "",
                     }}
                     onEdit={handleOpenEditProject}
                     onDelete={handleOpenDeleteProject}
@@ -287,10 +287,13 @@ export default function ProjectDetailPage({
       <ProjectModal
         isOpen={isProjectModalOpen}
         isEdit={true}
-        initialValues={{ name: projectName ?? "" }}
+        initialValues={{
+          name: projectName ?? "",
+          description: "",
+        }}
         onSubmit={async (values) => {
           if (onEditProject) {
-            await onEditProject(values.name);
+            await onEditProject(values.name, values.description);
           }
           setIsProjectModalOpen(false);
         }}
@@ -363,7 +366,7 @@ export default function ProjectDetailPage({
           onSubmit={async (values) => {
             if (isEditVariable && selectedVariable && onEditVariable) {
               await onEditVariable(
-                selectedVariable.id,
+                selectedVariable,
                 values.key,
                 values.value,
               );
@@ -394,7 +397,7 @@ export default function ProjectDetailPage({
         cancelText="Cancel"
         onConfirm={async () => {
           if (variableToDelete && onDeleteVariable)
-            await onDeleteVariable(variableToDelete.id);
+            await onDeleteVariable(variableToDelete);
           setIsDeleteVariableModalOpen(false);
           setVariableToDelete(null);
         }}

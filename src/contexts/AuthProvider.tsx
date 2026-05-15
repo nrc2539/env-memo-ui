@@ -1,7 +1,9 @@
 import { useState, useMemo, useCallback, type ReactNode } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import { getAccessToken, setTokens, clearTokens } from "../libs/api/client";
-import { AuthContext } from "./AuthContext";
+import { useAuthAction } from "@/hooks/actions/useAuthAction";
+import { AuthContext, type UserProfile } from "./AuthContext";
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -23,6 +25,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
     () => getInitialAuthState().isAuthenticated,
   );
 
+  const { getProfile } = useAuthAction();
+
+  const { data: user } = useQuery({
+    queryKey: ["profile"],
+    queryFn: getProfile,
+    enabled: isAuthenticated,
+  });
+
   const setToken = useCallback((accessToken: string, refreshToken: string) => {
     setTokens(accessToken, refreshToken);
     setTokenState(accessToken);
@@ -43,11 +53,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     () => ({
       isAuthenticated,
       token,
+      user: (user as UserProfile | undefined) ?? null,
       setToken,
       clearToken,
       getToken,
     }),
-    [isAuthenticated, token, setToken, clearToken, getToken],
+    [isAuthenticated, token, user, setToken, clearToken, getToken],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { Link, NavLink, Outlet } from "react-router";
+import { Link, NavLink, Outlet, useNavigate } from "react-router";
 import {
   IconFolder,
   IconSettings,
   IconLogout,
   IconMenu2,
 } from "@tabler/icons-react";
+
+import { useAuth } from "@/hooks/useAuth";
 
 const navItems = [
   { to: "/projects", label: "Projects", icon: IconFolder },
@@ -14,6 +16,15 @@ const navItems = [
 
 export default function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { user, clearToken } = useAuth();
+  const navigate = useNavigate();
+
+  const initials = user?.name?.charAt(0).toUpperCase() ?? "?";
+
+  function handleLogout() {
+    clearToken();
+    navigate("/login", { replace: true });
+  }
 
   return (
     <div className="flex h-dvh bg-gray-50">
@@ -60,6 +71,7 @@ export default function AppLayout() {
         <div className="border-t border-teal-600 px-3 py-4">
           <button
             type="button"
+            onClick={handleLogout}
             className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-teal-100 transition hover:bg-teal-600 hover:text-white"
           >
             <IconLogout size={20} />
@@ -84,14 +96,16 @@ export default function AppLayout() {
 
           <div className="flex items-center gap-3">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-teal-600 text-sm font-semibold text-white">
-              JD
+              {initials}
             </div>
-            <span className="text-sm font-medium text-gray-700">John Doe</span>
+            <span className="text-sm font-medium text-gray-700">
+              {user?.name ?? "User"}
+            </span>
           </div>
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-hidden p-4 md:p-6">
+        <main className="flex-1 overflow-auto sm:overflow-hidden p-4 md:p-6">
           <Outlet />
         </main>
       </div>

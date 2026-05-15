@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 
 import { useAlert } from "@/hooks/useAlert";
 import { Loading } from "@/components/Loading";
@@ -18,19 +19,25 @@ export default function ProjectListPage({
   const [isEdit, setIsEdit] = useState(false);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [page, setPage] = useState(1);
 
   const { success, error, info } = useAlert();
   const { getProjects, createProject, updateProject, deleteProject } =
     useProjectAction();
   const queryClient = useQueryClient();
 
-  const { data: projectsData, isLoading } = useQuery({
-    queryKey: ["projects"],
-    queryFn: getProjects,
+  const { data: paginatedData, isLoading } = useQuery({
+    queryKey: ["projects", page],
+    queryFn: () => getProjects(page),
+    placeholderData: (prev) => prev,
   });
 
+  const displayProjects = paginatedData?.data ?? projects;
+  const meta = paginatedData?.meta;
+
   const createMutation = useMutation({
-    mutationFn: (name: string) => createProject(name),
+    mutationFn: ({ name, description }: { name: string; description: string }) =>
+      createProject(name, description || undefined),
     onSuccess: () => {
       success({
         message: "Create project success",
@@ -48,8 +55,8 @@ export default function ProjectListPage({
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, name }: { id: number; name: string }) =>
-      updateProject(id, name),
+    mutationFn: ({ id, name, description }: { id: number; name: string; description: string }) =>
+      updateProject(id, name, description || null),
     onSuccess: () => {
       success({
         message: "Update project success",
@@ -86,8 +93,6 @@ export default function ProjectListPage({
     },
   });
 
-  const displayProjects = projectsData ?? projects;
-
   function handleOpenCreateModal() {
     setIsEdit(false);
     setSelectedProject(null);
@@ -105,14 +110,15 @@ export default function ProjectListPage({
     setIsDeleteModalOpen(true);
   }
 
-  async function handleModalSubmit(values: { name: string }) {
+  async function handleModalSubmit(values: { name: string; description: string }) {
     if (isEdit && selectedProject) {
       await updateMutation.mutateAsync({
         id: selectedProject.id,
         name: values.name,
+        description: values.description,
       });
     } else {
-      await createMutation.mutateAsync(values.name);
+      await createMutation.mutateAsync(values);
     }
   }
 
@@ -121,6 +127,8 @@ export default function ProjectListPage({
       deleteMutation.mutateAsync(selectedProject.id);
     }
   }
+
+  const totalPages = meta?.totalPages ?? 1;
 
   return (
     <div>
@@ -138,16 +146,44 @@ export default function ProjectListPage({
       {isLoading ? (
         <Loading size="lg" />
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {displayProjects?.map((project) => (
-            <ProjectCard
-              key={project.id}
-              project={project}
-              onEdit={handleOpenEditModal}
-              onDelete={handleOpenDeleteModal}
-            />
-          ))}
-        </div>
+        <>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {displayProjects?.map((project) => (
+              <ProjectCard
+                key={project.id}
+                project={project}
+                onEdit={handleOpenEditModal}
+                onDelete={handleOpenDeleteModal}
+              />
+            ))}
+          </div>
+
+          {totalPages > 1 && (
+            <div className="mt-8 flex items-center justify-center gap-4">
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page <= 1}
+                className="flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <IconChevronLeft size={16} />
+                Previous
+              </button>
+              <span className="text-sm text-gray-500">
+                Page {page} of {totalPages}
+              </span>
+              <button
+                type="button"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page >= totalPages}
+                className="flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Next
+                <IconChevronRight size={16} />
+              </button>
+            </div>
+          )}
+        </>
       )}
 
       {isModalOpen && (
@@ -155,7 +191,9 @@ export default function ProjectListPage({
           isOpen={isModalOpen}
           isEdit={isEdit}
           initialValues={
-            selectedProject ? { name: selectedProject.name } : undefined
+            selectedProject
+              ? { name: selectedProject.name, description: selectedProject.description ?? "" }
+              : undefined
           }
           onSubmit={handleModalSubmit}
           onCancel={() => {

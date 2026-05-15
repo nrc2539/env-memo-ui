@@ -22,7 +22,7 @@ export default function withSetupPasswordPage(
       enabled: !!token,
     });
 
-    const isValidToken = tokenData?.valid ?? false;
+    const isValidToken = !!tokenData;
     const name = tokenData?.name ?? "";
     const email = tokenData?.email ?? "";
 

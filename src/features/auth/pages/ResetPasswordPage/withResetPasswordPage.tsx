@@ -22,7 +22,7 @@ export default function withResetPasswordPage(
       enabled: !!token,
     });
 
-    const isValidToken = tokenData?.valid ?? false;
+    const isValidToken = !!tokenData;
 
     const resetPasswordMutation = useMutation({
       mutationFn: (password: string) => resetPassword(token!, password),

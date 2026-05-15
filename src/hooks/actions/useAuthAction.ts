@@ -1,22 +1,103 @@
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+import { useApiClient } from "@/hooks/useApiClient";
+
+interface VerifyTokenResponse {
+  id: number;
+  email: string;
+  name: string;
+  tokenType: "reset" | "setup";
+}
+
+interface LoginResponse {
+  accessToken: string;
+  refreshToken: string;
+}
 
 export function useAuthAction() {
-  async function verifyToken(token: string | null, type: "reset" | "setup"): Promise<{ valid: boolean; name: string; email: string }> {
-    await delay(1500);
-    console.log("verify token", { token, type });
-    const valid = !!token && token.length >= 10;
-    return { valid, name: "John Doe", email: "john@example.com" };
+  const apiClient = useApiClient();
+
+  async function login(
+    email: string,
+    password: string,
+  ): Promise<LoginResponse> {
+    const { data } = await apiClient.post<LoginResponse>("/auth/login", {
+      email,
+      password,
+    });
+    return data;
   }
 
-  async function resetPassword(token: string, password: string): Promise<void> {
-    await delay(1000);
-    console.log("reset password", { token, password });
+  async function register(
+    name: string,
+    email: string,
+    password: string,
+  ): Promise<void> {
+    await apiClient.post("/auth/register", { name, email, password });
   }
 
-  async function setupPassword(token: string, password: string, name: string): Promise<void> {
-    await delay(1000);
-    console.log("setup password", { token, password, name });
+  async function forgotPassword(email: string): Promise<void> {
+    await apiClient.post("/auth/forgot-password", { email });
   }
 
-  return { verifyToken, resetPassword, setupPassword };
+  async function verifyToken(
+    token: string | null,
+    type: "reset" | "setup",
+  ): Promise<VerifyTokenResponse> {
+    const { data } = await apiClient.post<VerifyTokenResponse>(
+      "/auth/verify-token",
+      { token, type },
+    );
+    return data;
+  }
+
+  async function resetPassword(
+    token: string,
+    password: string,
+  ): Promise<void> {
+    await apiClient.post("/auth/reset-password", { token, password });
+  }
+
+  async function setupPassword(
+    token: string,
+    password: string,
+    name: string,
+  ): Promise<void> {
+    await apiClient.post("/auth/setup-password", { token, password, name });
+  }
+
+  async function changePassword(
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<void> {
+    await apiClient.post("/auth/change-password", {
+      currentPassword,
+      newPassword,
+    });
+  }
+
+  interface UserProfile {
+    id: number;
+    email: string;
+    name: string;
+  }
+
+  async function getProfile(): Promise<UserProfile> {
+    const { data } = await apiClient.get<UserProfile>("/auth/profile");
+    return data;
+  }
+
+  async function updateProfile(name: string): Promise<void> {
+    await apiClient.patch("/auth/profile", { name });
+  }
+
+  return {
+    login,
+    register,
+    forgotPassword,
+    verifyToken,
+    resetPassword,
+    setupPassword,
+    changePassword,
+    getProfile,
+    updateProfile,
+  };
 }

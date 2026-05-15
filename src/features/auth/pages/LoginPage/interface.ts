@@ -5,5 +5,5 @@ export interface LoginFormValues {
 
 export interface LoginPageProps {
   initialValues: LoginFormValues;
-  onSubmit: (values: LoginFormValues) => void;
+  onSubmit: (values: LoginFormValues) => Promise<void>;
 }

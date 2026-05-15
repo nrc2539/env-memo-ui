@@ -2,9 +2,9 @@ import type { EnvVariable } from "@/features/project/pages/ProjectDetailPage/int
 
 export interface EnvVariableTableProps {
   variables: EnvVariable[];
-  selected?: Set<number>;
+  selected?: Set<string>;
   onToggleAll: () => void;
-  onToggleVar: (id: number) => void;
+  onToggleVar: (id: string) => void;
   onEdit?: (variable: EnvVariable) => void;
   onDelete?: (variable: EnvVariable) => void;
 }

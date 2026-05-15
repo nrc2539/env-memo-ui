@@ -3,11 +3,16 @@ import { useNavigate, useParams } from "react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useAlert } from "@/hooks/useAlert";
+import { useAuth } from "@/hooks/useAuth";
 import { useProjectAction } from "@/hooks/actions/useProjectAction";
 import { useProjectEnvAction } from "@/hooks/actions/useProjectEnvAction";
 import type { Role } from "@/enums/roleEnum";
 
-import type { ProjectDetailPageProps, EnvGroup } from "./interface";
+import type {
+  ProjectDetailPageProps,
+  EnvGroup,
+  EnvVariable,
+} from "./interface";
 
 export default function withProjectDetailPage(
   Component: React.FC<ProjectDetailPageProps>,
@@ -17,8 +22,9 @@ export default function withProjectDetailPage(
     const projectId = params.projectId;
     const projectIdNum = Number(projectId);
 
-    const { deleteProject } = useProjectAction();
+    const { deleteProject, updateProject } = useProjectAction();
     const {
+      getProjectDetail,
       getEnvGroups,
       createEnvGroup,
       updateEnvGroup,
@@ -27,20 +33,23 @@ export default function withProjectDetailPage(
       updateEnvVariable,
       deleteEnvVariable,
       inviteUserToProject,
-      getCurrentUserRole,
     } = useProjectEnvAction();
     const alert = useAlert();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
-    const currentUserRole = getCurrentUserRole();
-
-    const [expanded, setExpanded] = useState<Set<number>>(new Set());
-    const [selected, setSelected] = useState<Set<number>>(new Set());
+    const [expanded, setExpanded] = useState<Set<string>>(new Set());
+    const [selected, setSelected] = useState<Set<string>>(new Set());
     const [panelOpen, setPanelOpen] = useState(false);
     const [toast, setToast] = useState<string | null>(null);
 
     const groupsQueryKey = ["project", projectIdNum, "groups"];
+
+    const { data: projectDetail } = useQuery({
+      queryKey: ["project", projectIdNum],
+      queryFn: () => getProjectDetail(projectIdNum),
+      enabled: !!projectIdNum,
+    });
 
     const { data: groups = [] } = useQuery({
       queryKey: groupsQueryKey,
@@ -48,13 +57,19 @@ export default function withProjectDetailPage(
       enabled: !!projectIdNum,
     });
 
+    const { user: authUser } = useAuth();
+    const currentUserId = authUser?.id;
+    const currentUserRole: Role =
+      projectDetail?.members?.find((m) => m.userId === currentUserId)?.role ??
+      "VIEWER";
+
     useEffect(() => {
       if (!toast) return;
       const id = setTimeout(() => setToast(null), 2000);
       return () => clearTimeout(id);
     }, [toast]);
 
-    const toggleGroup = (id: number) => {
+    const toggleGroup = (id: string) => {
       setExpanded((prev) => {
         const next = new Set(prev);
         if (next.has(id)) next.delete(id);
@@ -63,7 +78,7 @@ export default function withProjectDetailPage(
       });
     };
 
-    const toggleVar = (id: number) => {
+    const toggleVar = (id: string) => {
       setSelected((prev) => {
         const next = new Set(prev);
         if (next.has(id)) next.delete(id);
@@ -94,7 +109,35 @@ export default function withProjectDetailPage(
       }
     }, []);
 
-    const onEditProject = useCallback(async () => {}, []);
+    const editProjectMutation = useMutation({
+      mutationFn: ({
+        name,
+        description,
+      }: {
+        name: string;
+        description: string | null;
+      }) => updateProject(projectIdNum, name, description),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["project", projectIdNum] });
+        alert.success({
+          message: "Project updated",
+          description: "Your project has been updated.",
+        });
+      },
+      onError: () => {
+        alert.error({
+          message: "Update project failed",
+          description: "Please try again.",
+        });
+      },
+    });
+
+    const onEditProject = useCallback(
+      async (name: string, description: string | null) => {
+        await editProjectMutation.mutateAsync({ name, description });
+      },
+      [editProjectMutation],
+    );
 
     const deleteProjectMutation = useMutation({
       mutationFn: (id: number) => deleteProject(id),
@@ -139,8 +182,8 @@ export default function withProjectDetailPage(
     });
 
     const editGroupMutation = useMutation({
-      mutationFn: ({ id, name }: { id: number; name: string }) =>
-        updateEnvGroup(id, name),
+      mutationFn: ({ id, name }: { id: string; name: string }) =>
+        updateEnvGroup(projectIdNum, id, name),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: groupsQueryKey });
         alert.success({
@@ -157,7 +200,7 @@ export default function withProjectDetailPage(
     });
 
     const deleteGroupMutation = useMutation({
-      mutationFn: (id: number) => deleteEnvGroup(id),
+      mutationFn: (id: string) => deleteEnvGroup(projectIdNum, id),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: groupsQueryKey });
         alert.info({
@@ -179,10 +222,10 @@ export default function withProjectDetailPage(
         key,
         value,
       }: {
-        groupId: number;
+        groupId: string;
         key: string;
         value: string;
-      }) => createEnvVariable(groupId, key, value),
+      }) => createEnvVariable(projectIdNum, groupId, key, value),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: groupsQueryKey });
         alert.success({
@@ -200,14 +243,21 @@ export default function withProjectDetailPage(
 
     const editVariableMutation = useMutation({
       mutationFn: ({
-        id,
+        variable,
         key,
         value,
       }: {
-        id: number;
+        variable: EnvVariable;
         key: string;
         value: string;
-      }) => updateEnvVariable(id, key, value),
+      }) =>
+        updateEnvVariable(
+          projectIdNum,
+          variable.envGroupId,
+          variable.id,
+          key,
+          value,
+        ),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: groupsQueryKey });
         alert.success({
@@ -224,7 +274,8 @@ export default function withProjectDetailPage(
     });
 
     const deleteVariableMutation = useMutation({
-      mutationFn: (id: number) => deleteEnvVariable(id),
+      mutationFn: (variable: EnvVariable) =>
+        deleteEnvVariable(projectIdNum, variable.envGroupId, variable.id),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: groupsQueryKey });
         alert.info({
@@ -270,36 +321,36 @@ export default function withProjectDetailPage(
     );
 
     const onEditGroup = useCallback(
-      async (id: number, name: string) => {
+      async (id: string, name: string) => {
         await editGroupMutation.mutateAsync({ id, name });
       },
       [editGroupMutation],
     );
 
     const onDeleteGroup = useCallback(
-      async (id: number) => {
+      async (id: string) => {
         await deleteGroupMutation.mutateAsync(id);
       },
       [deleteGroupMutation],
     );
 
     const onCreateVariable = useCallback(
-      async (groupId: number, key: string, value: string) => {
+      async (groupId: string, key: string, value: string) => {
         await createVariableMutation.mutateAsync({ groupId, key, value });
       },
       [createVariableMutation],
     );
 
     const onEditVariable = useCallback(
-      async (id: number, key: string, value: string) => {
-        await editVariableMutation.mutateAsync({ id, key, value });
+      async (variable: EnvVariable, key: string, value: string) => {
+        await editVariableMutation.mutateAsync({ variable, key, value });
       },
       [editVariableMutation],
     );
 
     const onDeleteVariable = useCallback(
-      async (id: number) => {
-        await deleteVariableMutation.mutateAsync(id);
+      async (variable: EnvVariable) => {
+        await deleteVariableMutation.mutateAsync(variable);
       },
       [deleteVariableMutation],
     );
@@ -313,7 +364,7 @@ export default function withProjectDetailPage(
 
     const componentProps: ProjectDetailPageProps = {
       projectId,
-      projectName: "Frontend App",
+      projectName: projectDetail?.name ?? "Loading...",
       groups,
       expanded,
       selected,

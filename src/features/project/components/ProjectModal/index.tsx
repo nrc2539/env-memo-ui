@@ -7,10 +7,11 @@ import { IconDeviceFloppy } from "@tabler/icons-react";
 
 import type { ProjectModalProps, ProjectFormValues } from "./interface";
 
-const initialValues: ProjectFormValues = { name: "" };
+const initialValues: ProjectFormValues = { name: "", description: "" };
 
 const validationSchema = Yup.object({
   name: Yup.string().trim().required("Project name is required"),
+  description: Yup.string(),
 });
 
 export function ProjectModal({
@@ -36,6 +37,11 @@ export function ProjectModal({
               label="Project Name"
               name="name"
               placeholder="Enter project name"
+            />
+            <InputField
+              label="Description"
+              name="description"
+              placeholder="Enter project description (optional)"
             />
             <div className="mt-2 flex justify-end gap-3">
               <button

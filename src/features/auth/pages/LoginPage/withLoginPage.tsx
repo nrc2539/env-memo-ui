@@ -1,14 +1,41 @@
+import { useMutation } from "@tanstack/react-query";
+import { useNavigate } from "react-router";
+
+import { useAlert } from "@/hooks/useAlert";
+import { useAuthAction } from "@/hooks/actions/useAuthAction";
+import { useAuth } from "@/hooks/useAuth";
+
 import type { LoginFormValues, LoginPageProps } from "./interface";
 
 export default function withLoginPage(Component: React.FC<LoginPageProps>) {
   function WithLoginPage() {
+    const navigate = useNavigate();
+    const { error: showError } = useAlert();
+    const { login } = useAuthAction();
+    const { setToken } = useAuth();
+
+    const loginMutation = useMutation({
+      mutationFn: ({ email, password }: LoginFormValues) =>
+        login(email, password),
+      onSuccess: (data) => {
+        setToken(data.accessToken, data.refreshToken);
+        navigate("/projects", { replace: true });
+      },
+      onError: () => {
+        showError({
+          message: "Login failed",
+          description: "Invalid email or password.",
+        });
+      },
+    });
+
     const initialValues: LoginFormValues = {
       email: "",
       password: "",
     };
 
-    function onSubmit(values: LoginFormValues) {
-      console.log(values);
+    async function onSubmit(values: LoginFormValues) {
+      await loginMutation.mutateAsync(values);
     }
 
     const componentProps: LoginPageProps = {

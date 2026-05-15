@@ -5,5 +5,5 @@ export interface ForgotFormValues {
 export interface ForgotPasswordPageProps {
   initialValues: ForgotFormValues;
   submittedEmail: string | null;
-  onSubmit: (values: ForgotFormValues) => void;
+  onSubmit: (values: ForgotFormValues) => Promise<void>;
 }

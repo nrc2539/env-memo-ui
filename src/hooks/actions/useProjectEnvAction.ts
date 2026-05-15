@@ -1,150 +1,113 @@
-import { Role } from "@/enums/roleEnum";
+import { useApiClient } from "@/hooks/useApiClient";
 
 import type {
   EnvGroup,
   EnvVariable,
+  ProjectDetail,
 } from "@/features/project/pages/ProjectDetailPage/interface";
 
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-const mockGroups: EnvGroup[] = [
-  {
-    id: 1,
-    name: "Staging",
-    variables: [
-      { id: 1, key: "API_URL", value: "https://staging.api.example.com" },
-      { id: 2, key: "DB_HOST", value: "staging-db.internal" },
-      { id: 3, key: "DB_PORT", value: "5432" },
-      { id: 4, key: "REDIS_URL", value: "redis://staging-redis:6379" },
-      { id: 5, key: "LOG_LEVEL", value: "debug" },
-    ],
-  },
-  {
-    id: 2,
-    name: "UAT",
-    variables: [
-      { id: 6, key: "API_URL", value: "https://uat.api.example.com" },
-      { id: 7, key: "DB_HOST", value: "uat-db.internal" },
-      { id: 8, key: "DB_PORT", value: "5432" },
-      { id: 9, key: "S3_BUCKET", value: "uat-assets" },
-    ],
-  },
-  {
-    id: 3,
-    name: "Production",
-    variables: [
-      { id: 10, key: "API_URL", value: "https://api.example.com" },
-      { id: 11, key: "DB_HOST", value: "prod-db.internal" },
-      { id: 12, key: "DB_PORT", value: "5432" },
-      { id: 13, key: "REDIS_URL", value: "redis://prod-redis:6379" },
-      { id: 14, key: "S3_BUCKET", value: "prod-assets" },
-      { id: 15, key: "LOG_LEVEL", value: "error" },
-      { id: 16, key: "CDN_URL", value: "https://cdn.example.com" },
-    ],
-  },
-];
-
-let nextGroupId = 4;
-let nextVarId = 17;
-
 export function useProjectEnvAction() {
+  const apiClient = useApiClient();
+
+  async function getProjectDetail(
+    projectId: number,
+  ): Promise<ProjectDetail> {
+    const { data } = await apiClient.get<ProjectDetail>(
+      `/projects/${projectId}`,
+    );
+    return data;
+  }
+
   async function getEnvGroups(projectId: number): Promise<EnvGroup[]> {
-    void projectId;
-    await delay(500);
-    return structuredClone(mockGroups);
+    const { data } = await apiClient.get<{ data: EnvGroup[] }>(
+      `/projects/${projectId}/env-groups`,
+      { params: { all: true } },
+    );
+    return data.data;
   }
 
   async function createEnvGroup(
     projectId: number,
     name: string,
   ): Promise<EnvGroup> {
-    void projectId;
-    await delay(500);
-    const newGroup: EnvGroup = {
-      id: nextGroupId++,
-      name,
-      variables: [],
-    };
-    mockGroups.push(newGroup);
-    return newGroup;
+    const { data } = await apiClient.post<EnvGroup>(
+      `/projects/${projectId}/env-groups`,
+      { name },
+    );
+    return data;
   }
 
   async function updateEnvGroup(
-    groupId: number,
+    projectId: number,
+    groupId: string,
     name: string,
   ): Promise<EnvGroup> {
-    await delay(500);
-    const group = mockGroups.find((g) => g.id === groupId);
-    if (!group) throw new Error("Group not found");
-    group.name = name;
-    return group;
+    const { data } = await apiClient.patch<EnvGroup>(
+      `/projects/${projectId}/env-groups/${groupId}`,
+      { name },
+    );
+    return data;
   }
 
-  async function deleteEnvGroup(groupId: number): Promise<void> {
-    await delay(500);
-    const index = mockGroups.findIndex((g) => g.id === groupId);
-    if (index === -1) throw new Error("Group not found");
-    mockGroups.splice(index, 1);
+  async function deleteEnvGroup(
+    projectId: number,
+    groupId: string,
+  ): Promise<void> {
+    await apiClient.delete(
+      `/projects/${projectId}/env-groups/${groupId}`,
+    );
   }
 
   async function createEnvVariable(
-    groupId: number,
+    projectId: number,
+    groupId: string,
     key: string,
     value: string,
   ): Promise<EnvVariable> {
-    await delay(500);
-    const group = mockGroups.find((g) => g.id === groupId);
-    if (!group) throw new Error("Group not found");
-    const newVar: EnvVariable = { id: nextVarId++, key, value };
-    group.variables.push(newVar);
-    return newVar;
+    const { data } = await apiClient.post<EnvVariable>(
+      `/projects/${projectId}/env-groups/${groupId}/variables`,
+      { key, value },
+    );
+    return data;
   }
 
   async function updateEnvVariable(
-    variableId: number,
+    projectId: number,
+    groupId: string,
+    variableId: string,
     key: string,
     value: string,
   ): Promise<EnvVariable> {
-    await delay(500);
-    for (const group of mockGroups) {
-      const variable = group.variables.find((v) => v.id === variableId);
-      if (variable) {
-        variable.key = key;
-        variable.value = value;
-        return variable;
-      }
-    }
-    throw new Error("Variable not found");
+    const { data } = await apiClient.patch<EnvVariable>(
+      `/projects/${projectId}/env-groups/${groupId}/variables/${variableId}`,
+      { key, value },
+    );
+    return data;
   }
 
-  async function deleteEnvVariable(variableId: number): Promise<void> {
-    await delay(500);
-    for (const group of mockGroups) {
-      const index = group.variables.findIndex((v) => v.id === variableId);
-      if (index !== -1) {
-        group.variables.splice(index, 1);
-        return;
-      }
-    }
-    throw new Error("Variable not found");
+  async function deleteEnvVariable(
+    projectId: number,
+    groupId: string,
+    variableId: string,
+  ): Promise<void> {
+    await apiClient.delete(
+      `/projects/${projectId}/env-groups/${groupId}/variables/${variableId}`,
+    );
   }
 
   async function inviteUserToProject(
     projectId: number,
     email: string,
-    role: Role,
+    role: string,
   ): Promise<void> {
-    void projectId;
-    void email;
-    void role;
-    await delay(500);
-  }
-
-  function getCurrentUserRole(): Role {
-    return Role.OWNER;
+    await apiClient.post(`/projects/${projectId}/invitations`, {
+      email,
+      role,
+    });
   }
 
   return {
+    getProjectDetail,
     getEnvGroups,
     createEnvGroup,
     updateEnvGroup,
@@ -153,6 +116,5 @@ export function useProjectEnvAction() {
     updateEnvVariable,
     deleteEnvVariable,
     inviteUserToProject,
-    getCurrentUserRole,
   };
 }

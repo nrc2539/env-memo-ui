@@ -89,15 +89,15 @@ apiClient.interceptors.response.use(
 
       try {
         const response = await axios.post(`${API_URL}/auth/refresh`, {
-          refresh_token: refreshToken,
+          refreshToken,
         });
 
-        const { access_token, refresh_token } = response.data;
-        setTokens(access_token, refresh_token);
+        const { accessToken, refreshToken: newRefreshToken } = response.data;
+        setTokens(accessToken, newRefreshToken);
 
-        processQueue(null, access_token);
+        processQueue(null, accessToken);
 
-        originalRequest.headers.Authorization = `Bearer ${access_token}`;
+        originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return apiClient(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
@@ -115,7 +115,7 @@ apiClient.interceptors.response.use(
 function isAccessTokenExpired(error: AxiosErrorType) {
   return (
     error.config &&
-    error.config.url !== `/auth/refresh-token` &&
+    error.config.url !== `/auth/refresh` &&
     error.response &&
     error.response.status === 401 &&
     error.response.data.message === "Unauthorized"
