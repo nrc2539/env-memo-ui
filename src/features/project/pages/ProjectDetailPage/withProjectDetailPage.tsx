@@ -6,7 +6,7 @@ import { useAlert } from "@/hooks/useAlert";
 import { useAuth } from "@/hooks/useAuth";
 import { useProjectAction } from "@/hooks/actions/useProjectAction";
 import { useProjectEnvAction } from "@/hooks/actions/useProjectEnvAction";
-import type { Role } from "@/enums/roleEnum";
+import { Role } from "@/enums/roleEnum";
 
 import type {
   ProjectDetailPageProps,
@@ -61,7 +61,7 @@ export default function withProjectDetailPage(
     const currentUserId = authUser?.id;
     const currentUserRole: Role =
       projectDetail?.members?.find((m) => m.userId === currentUserId)?.role ??
-      "VIEWER";
+      Role.VIEWER;
 
     useEffect(() => {
       if (!toast) return;
@@ -292,13 +292,8 @@ export default function withProjectDetailPage(
     });
 
     const inviteUserMutation = useMutation({
-      mutationFn: ({
-        email,
-        role,
-      }: {
-        email: string;
-        role: string;
-      }) => inviteUserToProject(projectIdNum, email, role as Role),
+      mutationFn: ({ email, role }: { email: string; role: string }) =>
+        inviteUserToProject(projectIdNum, email, role as Role),
       onSuccess: () => {
         alert.success({
           message: "User invited",

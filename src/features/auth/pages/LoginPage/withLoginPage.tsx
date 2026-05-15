@@ -1,5 +1,4 @@
 import { useMutation } from "@tanstack/react-query";
-import { useNavigate } from "react-router";
 
 import { useAlert } from "@/hooks/useAlert";
 import { useAuthAction } from "@/hooks/actions/useAuthAction";
@@ -9,7 +8,6 @@ import type { LoginFormValues, LoginPageProps } from "./interface";
 
 export default function withLoginPage(Component: React.FC<LoginPageProps>) {
   function WithLoginPage() {
-    const navigate = useNavigate();
     const { error: showError } = useAlert();
     const { login } = useAuthAction();
     const { setToken } = useAuth();
@@ -19,7 +17,6 @@ export default function withLoginPage(Component: React.FC<LoginPageProps>) {
         login(email, password),
       onSuccess: (data) => {
         setToken(data.accessToken, data.refreshToken);
-        navigate("/projects", { replace: true });
       },
       onError: () => {
         showError({
