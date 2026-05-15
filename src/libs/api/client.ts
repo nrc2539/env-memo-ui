@@ -24,6 +24,12 @@ export const clearTokens = (): void => {
   localStorage.removeItem(REFRESH_TOKEN_KEY);
 };
 
+let _onLogout: (() => void) | null = null;
+
+export const registerLogoutHandler = (fn: (() => void) | null) => {
+  _onLogout = fn;
+};
+
 let isRefreshing = false;
 let failedQueue: Array<{
   resolve: (value: string) => void;
@@ -82,11 +88,6 @@ apiClient.interceptors.response.use(
 
       const refreshToken = getRefreshToken();
 
-      if (!refreshToken) {
-        clearTokens();
-        return Promise.reject(error);
-      }
-
       try {
         const response = await axios.post(`${API_URL}/auth/refresh`, {
           refreshToken,
@@ -101,7 +102,7 @@ apiClient.interceptors.response.use(
         return apiClient(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
-        clearTokens();
+        _onLogout?.();
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

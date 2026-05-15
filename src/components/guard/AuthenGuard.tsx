@@ -1,5 +1,5 @@
-import { type ReactNode } from "react";
-import { Navigate, useLocation } from "react-router";
+import { useEffect, type ReactNode } from "react";
+import { useLocation, useNavigate } from "react-router";
 
 import { useAuth } from "@/hooks/useAuth";
 
@@ -10,11 +10,14 @@ interface AuthenGuardProps {
 export default function AuthenGuard({ children }: AuthenGuardProps) {
   const { isAuthenticated } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
 
-  if (!isAuthenticated) {
-    sessionStorage.setItem("redirectAfterLogin", location.pathname);
-    return <Navigate to="/login" replace />;
-  }
+  useEffect(() => {
+    if (!isAuthenticated) {
+      sessionStorage.setItem("redirectAfterLogin", location.pathname);
+      navigate("/login", { replace: true });
+    }
+  }, [isAuthenticated, location, navigate]);
 
   return children;
 }

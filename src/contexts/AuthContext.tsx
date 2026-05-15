@@ -8,11 +8,9 @@ export interface UserProfile {
 
 export interface AuthContextType {
   isAuthenticated: boolean;
-  token: string | null;
   user: UserProfile | null;
   setToken: (accessToken: string, refreshToken: string) => void;
-  clearToken: () => void;
-  getToken: () => string | null;
+  clearUserData: () => void;
 }
 
 export const AuthContext = createContext<AuthContextType>(

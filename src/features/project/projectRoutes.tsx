@@ -1,4 +1,4 @@
-import type { RouteObject } from "react-router";
+import { Outlet, type RouteObject } from "react-router";
 
 import AuthenGuard from "@/components/guard/AuthenGuard";
 import ProjectGuard from "@/components/guard/ProjectGuard";
@@ -11,7 +11,9 @@ export const projectRoutes: RouteObject[] = [
     path: "/projects",
     element: (
       <AuthenGuard>
-        <AppLayout />
+        <AppLayout>
+          <Outlet />
+        </AppLayout>
       </AuthenGuard>
     ),
     children: [

@@ -1,7 +1,12 @@
-import { useState, useMemo, useCallback, type ReactNode } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect, useCallback, type ReactNode } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { getAccessToken, setTokens, clearTokens } from "../libs/api/client";
+import {
+  getAccessToken,
+  setTokens,
+  clearTokens,
+  registerLogoutHandler,
+} from "../libs/api/client";
 import { useAuthAction } from "@/hooks/actions/useAuthAction";
 import { AuthContext, type UserProfile } from "./AuthContext";
 
@@ -9,23 +14,12 @@ interface AuthProviderProps {
   children: ReactNode;
 }
 
-const getInitialAuthState = () => {
-  const storedToken = getAccessToken();
-  return {
-    token: storedToken,
-    isAuthenticated: !!storedToken,
-  };
-};
-
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [token, setTokenState] = useState<string | null>(
-    () => getInitialAuthState().token,
-  );
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
-    () => getInitialAuthState().isAuthenticated,
+    () => !!getAccessToken(),
   );
-
   const { getProfile } = useAuthAction();
+  const queryClient = useQueryClient();
 
   const { data: user } = useQuery({
     queryKey: ["profile"],
@@ -33,33 +27,34 @@ export function AuthProvider({ children }: AuthProviderProps) {
     enabled: isAuthenticated,
   });
 
+  const clearUserData = useCallback(() => {
+    setIsAuthenticated(false);
+    queryClient.clear();
+    clearTokens();
+  }, [queryClient]);
+
+  useEffect(() => {
+    registerLogoutHandler(clearUserData);
+    return () => registerLogoutHandler(null);
+  }, [clearUserData]);
+
   const setToken = useCallback((accessToken: string, refreshToken: string) => {
     setTokens(accessToken, refreshToken);
-    setTokenState(accessToken);
     setIsAuthenticated(true);
   }, []);
 
-  const clearToken = useCallback(() => {
-    clearTokens();
-    setTokenState(null);
-    setIsAuthenticated(false);
-  }, []);
+  console.log({ isAuthenticated });
 
-  const getToken = useCallback((): string | null => {
-    return getAccessToken();
-  }, []);
-
-  const value = useMemo(
-    () => ({
-      isAuthenticated,
-      token,
-      user: (user as UserProfile | undefined) ?? null,
-      setToken,
-      clearToken,
-      getToken,
-    }),
-    [isAuthenticated, token, user, setToken, clearToken, getToken],
+  return (
+    <AuthContext.Provider
+      value={{
+        isAuthenticated,
+        user: (user as UserProfile | undefined) ?? null,
+        setToken,
+        clearUserData,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
   );
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

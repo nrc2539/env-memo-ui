@@ -47,7 +47,6 @@ export default function ProjectGuard({ children }: ProjectGuardProps) {
         message: "Error",
         description: "Something went wrong. Please try again.",
       });
-      navigate("/projects", { replace: true });
       return;
     }
   }, [projectIdNum, error, data, user, info, showError, navigate]);

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, NavLink, Outlet, useNavigate } from "react-router";
+import { Link, NavLink, useNavigate } from "react-router";
 import {
   IconFolder,
   IconSettings,
@@ -14,15 +14,15 @@ const navItems = [
   { to: "/settings", label: "Settings", icon: IconSettings },
 ];
 
-export default function AppLayout() {
+export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { user, clearToken } = useAuth();
+  const { user, clearUserData } = useAuth();
   const navigate = useNavigate();
 
   const initials = user?.name?.charAt(0).toUpperCase() ?? "?";
 
   function handleLogout() {
-    clearToken();
+    clearUserData();
     navigate("/login", { replace: true });
   }
 
@@ -106,7 +106,7 @@ export default function AppLayout() {
 
         {/* Page content */}
         <main className="flex-1 overflow-auto sm:overflow-hidden p-4 md:p-6">
-          <Outlet />
+          {children}
         </main>
       </div>
     </div>
