@@ -76,6 +76,7 @@ export default function ProjectDetailPage({
 
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
+  const isOwner = currentUserRole === Role.OWNER;
   const isViewer = currentUserRole === Role.VIEWER;
 
   const selectedVars: EnvVariable[] = [];
@@ -158,7 +159,7 @@ export default function ProjectDetailPage({
                 <h1 className="text-2xl font-semibold text-gray-900">
                   {projectName}
                 </h1>
-                {!isViewer && (
+                {isOwner && (
                   <ProjectMenu
                     project={{
                       id: Number(projectId),
@@ -177,7 +178,7 @@ export default function ProjectDetailPage({
               </p>
             </div>
             <div className="flex gap-3">
-              {!isViewer && (
+              {isOwner && (
                 <button
                   type="button"
                   onClick={handleOpenInviteModal}
