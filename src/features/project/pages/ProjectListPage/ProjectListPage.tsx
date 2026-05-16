@@ -42,7 +42,7 @@ export default function ProjectListPage({
         </button>
       </div>
 
-      <div className="mb-6">
+      <div className="mb-0 md:mb-4">
         <Input
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
