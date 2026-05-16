@@ -1,7 +1,9 @@
-import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
+import { IconSearch } from "@tabler/icons-react";
 
 import { Loading } from "@/components/Loading";
 import { ConfirmModal } from "@/components/ConfirmModal";
+import Input from "@/components/Input";
+import Pagination from "@/components/Pagination";
 import { ProjectCard } from "@/features/project/components/ProjectCard";
 import { ProjectModal } from "@/features/project/components/ProjectModal";
 
@@ -12,6 +14,7 @@ export default function ProjectListPage({
   isLoading,
   page,
   totalPages,
+  search,
   isModalOpen,
   isEdit,
   selectedProject,
@@ -24,6 +27,7 @@ export default function ProjectListPage({
   onCloseModal,
   onCancelDelete,
   onPageChange,
+  onSearchChange,
 }: ProjectListPageViewProps) {
   return (
     <div>
@@ -36,6 +40,15 @@ export default function ProjectListPage({
         >
           New Project
         </button>
+      </div>
+
+      <div className="mb-6">
+        <Input
+          value={search}
+          onChange={(e) => onSearchChange(e.target.value)}
+          placeholder="Search projects..."
+          leftIcon={<IconSearch size={18} className="text-gray-400" />}
+        />
       </div>
 
       {isLoading ? (
@@ -53,31 +66,12 @@ export default function ProjectListPage({
             ))}
           </div>
 
-          {totalPages > 1 && (
-            <div className="mt-8 flex items-center justify-center gap-4">
-              <button
-                type="button"
-                onClick={() => onPageChange(page - 1)}
-                disabled={page <= 1}
-                className="flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <IconChevronLeft size={16} />
-                Previous
-              </button>
-              <span className="text-sm text-gray-500">
-                Page {page} of {totalPages}
-              </span>
-              <button
-                type="button"
-                onClick={() => onPageChange(page + 1)}
-                disabled={page >= totalPages}
-                className="flex items-center gap-1 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                Next
-                <IconChevronRight size={16} />
-              </button>
-            </div>
-          )}
+          <Pagination
+            className="mt-8"
+            page={page}
+            totalPages={totalPages}
+            onPageChange={onPageChange}
+          />
         </>
       )}
 

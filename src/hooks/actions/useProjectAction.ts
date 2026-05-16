@@ -1,5 +1,6 @@
 import { useApiClient } from "@/hooks/useApiClient";
 import type { PaginatedResponse } from "@/interfaces/PaginatedResponse";
+import type { PaginationType } from "@/interfaces/PaginationType";
 import type { Project } from "@/features/project/pages/ProjectListPage/interface";
 import type { ProjectDetail } from "@/features/project/pages/ProjectDetailPage/interface";
 
@@ -7,12 +8,11 @@ export function useProjectAction() {
   const apiClient = useApiClient();
 
   async function getProjects(
-    page = 1,
-    limitPerPage = 10,
+    params?: PaginationType & { search?: string },
   ): Promise<PaginatedResponse<Project>> {
     const { data } = await apiClient.get<PaginatedResponse<Project>>(
       "/projects",
-      { params: { page, limitPerPage } },
+      { params },
     );
     return data;
   }
@@ -49,9 +49,7 @@ export function useProjectAction() {
     return data;
   }
 
-  async function getProjectDetail(
-    projectId: number,
-  ): Promise<ProjectDetail> {
+  async function getProjectDetail(projectId: number): Promise<ProjectDetail> {
     const { data } = await apiClient.get<ProjectDetail>(
       `/projects/${projectId}`,
     );

@@ -3,6 +3,7 @@ import { IconUserPlus } from "@tabler/icons-react";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { ConfirmModal } from "@/components/ConfirmModal";
 import { Loading } from "@/components/Loading";
+import Pagination from "@/components/Pagination";
 import { InviteUserModal } from "@/features/project/components/InviteUserModal";
 import { MemberTable } from "./components/MemberTable";
 import { InvitationTable } from "./components/InvitationTable";
@@ -19,6 +20,8 @@ export default function ProjectMemberPage({
   currentUserRole,
   isOwner,
   isLoading,
+  page,
+  totalPages,
   isInviteModalOpen,
   isDeleteMemberModalOpen,
   selectedMember,
@@ -28,6 +31,7 @@ export default function ProjectMemberPage({
   onRemoveMember,
   onConfirmRemoveMember,
   onCancelRemoveMember,
+  onPageChange,
 }: ProjectMemberPageViewProps) {
   if (isLoading) return <Loading size="lg" className="mt-10" />;
 
@@ -60,6 +64,13 @@ export default function ProjectMemberPage({
         currentUserId={currentUserId}
         isOwner={isOwner}
         onRemove={onRemoveMember}
+      />
+
+      <Pagination
+        className="mt-6"
+        page={page}
+        totalPages={totalPages}
+        onPageChange={onPageChange}
       />
 
       {isOwner && invitations.length > 0 && (

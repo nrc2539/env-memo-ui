@@ -1,4 +1,5 @@
 import type { Role } from "@/enums/roleEnum";
+import type { InvitationStatus } from "@/enums/invitationStatusEnum";
 
 export interface ProjectMember {
   id: string;
@@ -17,10 +18,14 @@ export interface Invitation {
   id: string;
   email: string;
   role: Role;
-  status: string;
+  status: InvitationStatus;
   createdAt: string;
   updatedAt: string;
 }
+
+export type ProjectMemberSearchParams = {
+  page: number;
+};
 
 export interface ProjectMemberPageViewProps {
   projectId: string;
@@ -31,6 +36,8 @@ export interface ProjectMemberPageViewProps {
   currentUserRole: Role;
   isOwner: boolean;
   isLoading: boolean;
+  page: number;
+  totalPages: number;
   isInviteModalOpen: boolean;
   isDeleteMemberModalOpen: boolean;
   selectedMember: ProjectMember | null;
@@ -40,4 +47,5 @@ export interface ProjectMemberPageViewProps {
   onRemoveMember: (member: ProjectMember) => void;
   onConfirmRemoveMember: () => void;
   onCancelRemoveMember: () => void;
+  onPageChange: (page: number) => void;
 }

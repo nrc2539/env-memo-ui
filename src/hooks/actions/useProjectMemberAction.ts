@@ -4,7 +4,9 @@ import type {
   ProjectMember,
   Invitation,
 } from "@/features/project/pages/ProjectMemberPage/interface";
+import type { InvitationStatus } from "@/enums/invitationStatusEnum";
 import type { PaginatedResponse } from "@/interfaces/PaginatedResponse";
+import type { PaginationType } from "@/interfaces/PaginationType";
 
 export function useProjectMemberAction() {
   const apiClient = useApiClient();
@@ -22,24 +24,22 @@ export function useProjectMemberAction() {
 
   async function getProjectMembers(
     projectId: number,
-    page = 1,
-    limitPerPage = 100,
+    params?: PaginationType,
   ): Promise<PaginatedResponse<ProjectMember>> {
     const { data } = await apiClient.get<PaginatedResponse<ProjectMember>>(
       `/projects/${projectId}/members`,
-      { params: { page, limitPerPage } },
+      { params },
     );
     return data;
   }
 
   async function getProjectInvitations(
     projectId: number,
-    page = 1,
-    limitPerPage = 100,
+    params?: PaginationType & { status?: InvitationStatus },
   ): Promise<PaginatedResponse<Invitation>> {
     const { data } = await apiClient.get<PaginatedResponse<Invitation>>(
       `/projects/${projectId}/invitations`,
-      { params: { page, limitPerPage } },
+      { params },
     );
     return data;
   }

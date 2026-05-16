@@ -4,11 +4,15 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useAlert } from "@/hooks/useAlert";
 import { useAuth } from "@/hooks/useAuth";
+import { useGetQuery } from "@/hooks/useGetQuery";
+import { useQueryStrings } from "@/hooks/useQueryStrings";
 import { useProjectAction } from "@/hooks/actions/useProjectAction";
 import { useProjectMemberAction } from "@/hooks/actions/useProjectMemberAction";
 import { Role } from "@/enums/roleEnum";
+import { InvitationStatus } from "@/enums/invitationStatusEnum";
 
 import type {
+  ProjectMemberSearchParams,
   ProjectMemberPageViewProps,
   ProjectMember,
   Invitation,
@@ -34,6 +38,13 @@ export default function withProjectMemberPage(
       removeProjectMember,
     } = useProjectMemberAction();
 
+    const { getNumberParam } = useGetQuery();
+    const { updateQueryStrings } = useQueryStrings<ProjectMemberSearchParams>();
+
+    const searchParams: ProjectMemberSearchParams = {
+      page: getNumberParam("page") ?? 1,
+    };
+
     const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
     const [isDeleteMemberModalOpen, setIsDeleteMemberModalOpen] =
       useState(false);
@@ -54,19 +65,20 @@ export default function withProjectMemberPage(
     const isOwner = currentUserRole === Role.OWNER;
 
     const { data: membersData, isLoading: isLoadingMembers } = useQuery({
-      queryKey: ["project", projectIdNum, "members"],
-      queryFn: () => getProjectMembers(projectIdNum),
+      queryKey: ["project", projectIdNum, "members", searchParams.page],
+      queryFn: () => getProjectMembers(projectIdNum, { page: searchParams.page }),
       enabled: !!projectIdNum,
     });
 
     const { data: invitationsData } = useQuery({
       queryKey: ["project", projectIdNum, "invitations"],
-      queryFn: () => getProjectInvitations(projectIdNum),
+      queryFn: () => getProjectInvitations(projectIdNum, { status: InvitationStatus.PENDING, all: true }),
       enabled: !!projectIdNum && isOwner,
     });
 
     const members = membersData?.data ?? projectDetail?.members ?? [];
     const invitations: Invitation[] = invitationsData?.data ?? [];
+    const totalPages = membersData?.meta?.totalPages ?? 1;
 
     const isLoading = !projectDetail || isLoadingMembers;
 
@@ -146,6 +158,10 @@ export default function withProjectMemberPage(
       setSelectedMember(null);
     }, []);
 
+    function handlePageChange(newPage: number) {
+      updateQueryStrings({ page: newPage });
+    }
+
     const viewProps: ProjectMemberPageViewProps = {
       projectId,
       projectName: projectDetail?.name ?? "",
@@ -155,6 +171,8 @@ export default function withProjectMemberPage(
       currentUserRole,
       isOwner,
       isLoading,
+      page: searchParams.page,
+      totalPages,
       isInviteModalOpen,
       isDeleteMemberModalOpen,
       selectedMember,
@@ -164,6 +182,7 @@ export default function withProjectMemberPage(
       onRemoveMember: handleRemoveMember,
       onConfirmRemoveMember: handleConfirmRemoveMember,
       onCancelRemoveMember: handleCancelRemoveMember,
+      onPageChange: handlePageChange,
     };
 
     return <Component {...viewProps} />;

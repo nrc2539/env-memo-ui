@@ -2,9 +2,16 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useAlert } from "@/hooks/useAlert";
+import { useGetQuery } from "@/hooks/useGetQuery";
+import { useQueryStrings } from "@/hooks/useQueryStrings";
+import { useDebounce } from "@/hooks/useDebounce";
 import { useProjectAction } from "@/hooks/actions/useProjectAction";
 
-import type { ProjectListPageViewProps, Project } from "./interface";
+import type {
+  ProjectListSearchParams,
+  ProjectListPageViewProps,
+  Project,
+} from "./interface";
 
 export default function withProjectListPage(
   Component: React.FC<ProjectListPageViewProps>,
@@ -16,16 +23,29 @@ export default function withProjectListPage(
       null,
     );
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [page, setPage] = useState(1);
 
     const { success, error, info } = useAlert();
     const { getProjects, createProject, updateProject, deleteProject } =
       useProjectAction();
     const queryClient = useQueryClient();
 
+    const { getNumberParam, getStringParam } = useGetQuery();
+    const { updateQueryStrings } = useQueryStrings<ProjectListSearchParams>();
+
+    const searchParams: ProjectListSearchParams = {
+      page: getNumberParam("page") ?? 1,
+      search: getStringParam("search"),
+    };
+    const debouncedSearch = useDebounce(searchParams.search, 300);
+
     const { data: paginatedData, isLoading } = useQuery({
-      queryKey: ["projects", page],
-      queryFn: () => getProjects(page, 2),
+      queryKey: ["projects", searchParams.page, debouncedSearch],
+      queryFn: () =>
+        getProjects({
+          page: searchParams.page,
+          limitPerPage: 9,
+          search: debouncedSearch || undefined,
+        }),
       placeholderData: (prev) => prev,
     });
 
@@ -150,13 +170,22 @@ export default function withProjectListPage(
       setSelectedProject(null);
     }
 
+    function handlePageChange(newPage: number) {
+      updateQueryStrings({ page: newPage, search: searchParams.search });
+    }
+
+    function handleSearchChange(newSearch: string) {
+      updateQueryStrings({ page: 1, search: newSearch });
+    }
+
     const totalPages = meta?.totalPages ?? 1;
 
     const viewProps: ProjectListPageViewProps = {
       displayProjects,
       isLoading,
-      page,
+      page: searchParams.page,
       totalPages,
+      search: searchParams.search,
       isModalOpen,
       isEdit,
       selectedProject,
@@ -168,7 +197,8 @@ export default function withProjectListPage(
       onConfirmDelete: handleDeleteConfirm,
       onCloseModal: handleCloseModal,
       onCancelDelete: handleCancelDelete,
-      onPageChange: setPage,
+      onPageChange: handlePageChange,
+      onSearchChange: handleSearchChange,
     };
 
     return <Component {...viewProps} />;

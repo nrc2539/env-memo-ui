@@ -9,11 +9,17 @@ export interface Project {
   role?: Role;
 }
 
+export type ProjectListSearchParams = {
+  page: number;
+  search: string;
+};
+
 export interface ProjectListPageViewProps {
   displayProjects: Project[];
   isLoading: boolean;
   page: number;
   totalPages: number;
+  search: string;
   isModalOpen: boolean;
   isEdit: boolean;
   selectedProject: Project | null;
@@ -26,4 +32,5 @@ export interface ProjectListPageViewProps {
   onCloseModal: () => void;
   onCancelDelete: () => void;
   onPageChange: (page: number) => void;
+  onSearchChange: (search: string) => void;
 }
