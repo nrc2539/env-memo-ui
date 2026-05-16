@@ -39,7 +39,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           <input
             ref={ref}
             className={cn(
-              "w-full text-sm bg-transparent outline-none transition placeholder:text-gray-400",
+              "w-full text-sm bg-transparent outline-none transition placeholder:text-gray-400 disabled:text-gray-500",
               className,
             )}
             {...props}
