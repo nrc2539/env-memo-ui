@@ -4,7 +4,8 @@ import { useSearchParams } from "react-router";
 
 import { useAuthAction } from "@/hooks/actions/useAuthAction";
 
-import type { SetupPasswordFormValues, SetupPasswordPageProps } from "./interface";
+import type { SetupPasswordFormType } from "@/models/SetupPasswordFormType";
+import type { SetupPasswordPageProps } from "./interface";
 
 export default function withSetupPasswordPage(
   Component: React.FC<SetupPasswordPageProps>,
@@ -34,14 +35,14 @@ export default function withSetupPasswordPage(
       },
     });
 
-    const initialValues: SetupPasswordFormValues = {
+    const initialValues: SetupPasswordFormType = {
       name,
       email,
       password: "",
       confirmPassword: "",
     };
 
-    async function onSubmit(values: SetupPasswordFormValues) {
+    async function onSubmit(values: SetupPasswordFormType) {
       await setupPasswordMutation.mutateAsync({
         password: values.password,
         name: values.name,

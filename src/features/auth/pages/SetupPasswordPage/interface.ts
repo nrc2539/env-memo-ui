@@ -1,14 +1,9 @@
-export interface SetupPasswordFormValues {
-  name: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
+import type { SetupPasswordFormType } from "@/models/SetupPasswordFormType";
 
 export interface SetupPasswordPageProps {
-  initialValues: SetupPasswordFormValues;
+  initialValues: SetupPasswordFormType;
   submitted: boolean;
-  onSubmit: (values: SetupPasswordFormValues) => void;
+  onSubmit: (values: SetupPasswordFormType) => void;
   validating: boolean;
   isValidToken: boolean;
 }

@@ -1,16 +1,16 @@
 import { useApiClient } from "@/hooks/useApiClient";
-import type { PaginatedResponse } from "@/interfaces/PaginatedResponse";
+import type { PaginatedResponseType } from "@/models/PaginatedResponseType";
 import type { PaginationType } from "@/interfaces/PaginationType";
-import type { Project } from "@/features/project/pages/ProjectListPage/interface";
-import type { ProjectDetail } from "@/features/project/pages/ProjectDetailPage/interface";
+import type { ProjectType } from "@/models/ProjectType";
+import type { ProjectDetailType } from "@/models/ProjectDetailType";
 
 export function useProjectAction() {
   const apiClient = useApiClient();
 
   async function getProjects(
     params?: PaginationType & { search?: string },
-  ): Promise<PaginatedResponse<Project>> {
-    const { data } = await apiClient.get<PaginatedResponse<Project>>(
+  ): Promise<PaginatedResponseType<ProjectType>> {
+    const { data } = await apiClient.get<PaginatedResponseType<ProjectType>>(
       "/projects",
       { params },
     );
@@ -20,8 +20,8 @@ export function useProjectAction() {
   async function createProject(
     name: string,
     description?: string,
-  ): Promise<Project> {
-    const { data } = await apiClient.post<Project>("/projects", {
+  ): Promise<ProjectType> {
+    const { data } = await apiClient.post<ProjectType>("/projects", {
       name,
       description: description ?? null,
     });
@@ -32,8 +32,8 @@ export function useProjectAction() {
     id: number,
     name: string,
     description?: string | null,
-  ): Promise<Project> {
-    const { data } = await apiClient.patch<Project>(`/projects/${id}`, {
+  ): Promise<ProjectType> {
+    const { data } = await apiClient.patch<ProjectType>(`/projects/${id}`, {
       name,
       description,
     });
@@ -44,13 +44,13 @@ export function useProjectAction() {
     await apiClient.delete(`/projects/${id}`);
   }
 
-  async function getProject(id: number): Promise<Project> {
-    const { data } = await apiClient.get<Project>(`/projects/${id}`);
+  async function getProject(id: number): Promise<ProjectType> {
+    const { data } = await apiClient.get<ProjectType>(`/projects/${id}`);
     return data;
   }
 
-  async function getProjectDetail(projectId: number): Promise<ProjectDetail> {
-    const { data } = await apiClient.get<ProjectDetail>(
+  async function getProjectDetail(projectId: number): Promise<ProjectDetailType> {
+    const { data } = await apiClient.get<ProjectDetailType>(
       `/projects/${projectId}`,
     );
     return data;

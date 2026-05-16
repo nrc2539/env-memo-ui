@@ -1,15 +1,13 @@
 import { useApiClient } from "@/hooks/useApiClient";
 
-import type {
-  EnvGroup,
-  EnvVariable,
-} from "@/features/project/pages/ProjectDetailPage/interface";
+import type { EnvGroupType } from "@/models/EnvGroupType";
+import type { EnvVariableType } from "@/models/EnvVariableType";
 
 export function useProjectEnvAction() {
   const apiClient = useApiClient();
 
-  async function getEnvGroups(projectId: number): Promise<EnvGroup[]> {
-    const { data } = await apiClient.get<{ data: EnvGroup[] }>(
+  async function getEnvGroups(projectId: number): Promise<EnvGroupType[]> {
+    const { data } = await apiClient.get<{ data: EnvGroupType[] }>(
       `/projects/${projectId}/env-groups`,
       { params: { all: true } },
     );
@@ -19,8 +17,8 @@ export function useProjectEnvAction() {
   async function createEnvGroup(
     projectId: number,
     name: string,
-  ): Promise<EnvGroup> {
-    const { data } = await apiClient.post<EnvGroup>(
+  ): Promise<EnvGroupType> {
+    const { data } = await apiClient.post<EnvGroupType>(
       `/projects/${projectId}/env-groups`,
       { name },
     );
@@ -31,8 +29,8 @@ export function useProjectEnvAction() {
     projectId: number,
     groupId: string,
     name: string,
-  ): Promise<EnvGroup> {
-    const { data } = await apiClient.patch<EnvGroup>(
+  ): Promise<EnvGroupType> {
+    const { data } = await apiClient.patch<EnvGroupType>(
       `/projects/${projectId}/env-groups/${groupId}`,
       { name },
     );
@@ -53,8 +51,8 @@ export function useProjectEnvAction() {
     groupId: string,
     key: string,
     value: string,
-  ): Promise<EnvVariable> {
-    const { data } = await apiClient.post<EnvVariable>(
+  ): Promise<EnvVariableType> {
+    const { data } = await apiClient.post<EnvVariableType>(
       `/projects/${projectId}/env-groups/${groupId}/variables`,
       { key, value },
     );
@@ -67,8 +65,8 @@ export function useProjectEnvAction() {
     variableId: string,
     key: string,
     value: string,
-  ): Promise<EnvVariable> {
-    const { data } = await apiClient.patch<EnvVariable>(
+  ): Promise<EnvVariableType> {
+    const { data } = await apiClient.patch<EnvVariableType>(
       `/projects/${projectId}/env-groups/${groupId}/variables/${variableId}`,
       { key, value },
     );

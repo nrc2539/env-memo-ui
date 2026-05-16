@@ -1,12 +1,9 @@
-export interface EnvVariableFormValues {
-  key: string;
-  value: string;
-}
+import type { EnvVariableFormType } from "@/models/EnvVariableFormType";
 
 export interface EnvVariableModalProps {
   isOpen: boolean;
   isEdit: boolean;
-  initialValues?: EnvVariableFormValues;
-  onSubmit: (values: EnvVariableFormValues) => Promise<void>;
+  initialValues?: EnvVariableFormType;
+  onSubmit: (values: EnvVariableFormType) => Promise<void>;
   onCancel: () => void;
 }

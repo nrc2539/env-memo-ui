@@ -4,7 +4,8 @@ import { useMutation } from "@tanstack/react-query";
 import { useAlert } from "@/hooks/useAlert";
 import { useAuthAction } from "@/hooks/actions/useAuthAction";
 
-import type { ForgotFormValues, ForgotPasswordPageProps } from "./interface";
+import type { ForgotFormType } from "@/models/ForgotFormType";
+import type { ForgotPasswordPageProps } from "./interface";
 
 export default function withForgotPasswordPage(
   Component: React.FC<ForgotPasswordPageProps>,
@@ -15,27 +16,27 @@ export default function withForgotPasswordPage(
     const { forgotPassword } = useAuthAction();
 
     const forgotPasswordMutation = useMutation({
-      mutationFn: ({ email }: ForgotFormValues) => forgotPassword(email),
+      mutationFn: ({ email }: ForgotFormType) => forgotPassword(email),
       onSuccess: (_data, variables) => {
-        setSubmittedEmail(variables.email);
         success({
-          message: "Reset link sent",
-          description: "If that email exists, a reset link has been sent.",
+          message: "Email sent",
+          description: "Check your inbox for the reset link.",
         });
+        setSubmittedEmail(variables.email);
       },
       onError: () => {
         showError({
-          message: "Request failed",
-          description: "Something went wrong. Please try again.",
+          message: "Failed to send email",
+          description: "Please try again.",
         });
       },
     });
 
-    const initialValues: ForgotFormValues = {
+    const initialValues: ForgotFormType = {
       email: "",
     };
 
-    async function onSubmit(values: ForgotFormValues) {
+    async function onSubmit(values: ForgotFormType) {
       await forgotPasswordMutation.mutateAsync(values);
     }
 

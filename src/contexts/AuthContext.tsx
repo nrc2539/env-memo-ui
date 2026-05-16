@@ -1,14 +1,10 @@
 import { createContext } from "react";
 
-export interface UserProfile {
-  id: number;
-  email: string;
-  name: string;
-}
+import type { UserProfileType } from "@/models/UserProfileType";
 
 export interface AuthContextType {
   isAuthenticated: boolean;
-  user: UserProfile | null;
+  user: UserProfileType | null;
   setToken: (accessToken: string, refreshToken: string) => void;
   clearUserData: () => void;
 }

@@ -1,8 +1,8 @@
-import type { ProjectMember } from "../../interface";
+import type { ProjectMemberType } from "@/models/ProjectMemberType";
 
 export interface MemberTableProps {
-  members: ProjectMember[];
+  members: ProjectMemberType[];
   currentUserId: number | undefined;
   isOwner: boolean;
-  onRemove: (member: ProjectMember) => void;
+  onRemove: (member: ProjectMemberType) => void;
 }

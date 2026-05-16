@@ -1,9 +1,7 @@
-export interface ForgotFormValues {
-  email: string;
-}
+import type { ForgotFormType } from "@/models/ForgotFormType";
 
 export interface ForgotPasswordPageProps {
-  initialValues: ForgotFormValues;
+  initialValues: ForgotFormType;
   submittedEmail: string | null;
-  onSubmit: (values: ForgotFormValues) => Promise<void>;
+  onSubmit: (values: ForgotFormType) => Promise<void>;
 }

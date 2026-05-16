@@ -7,11 +7,8 @@ import { useQueryStrings } from "@/hooks/useQueryStrings";
 import { useDebounce } from "@/hooks/useDebounce";
 import { useProjectAction } from "@/hooks/actions/useProjectAction";
 
-import type {
-  ProjectListSearchParams,
-  ProjectListPageViewProps,
-  Project,
-} from "./interface";
+import type { ProjectType } from "@/models/ProjectType";
+import type { ProjectListSearchParams, ProjectListPageViewProps } from "./interface";
 
 export default function withProjectListPage(
   Component: React.FC<ProjectListPageViewProps>,
@@ -19,7 +16,7 @@ export default function withProjectListPage(
   function WithProjectListPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEdit, setIsEdit] = useState(false);
-    const [selectedProject, setSelectedProject] = useState<Project | null>(
+    const [selectedProject, setSelectedProject] = useState<ProjectType | null>(
       null,
     );
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -128,13 +125,13 @@ export default function withProjectListPage(
       setIsModalOpen(true);
     }
 
-    function handleOpenEditModal(project: Project) {
+    function handleOpenEditModal(project: ProjectType) {
       setIsEdit(true);
       setSelectedProject(project);
       setIsModalOpen(true);
     }
 
-    function handleOpenDeleteModal(project: Project) {
+    function handleOpenDeleteModal(project: ProjectType) {
       setSelectedProject(project);
       setIsDeleteModalOpen(true);
     }

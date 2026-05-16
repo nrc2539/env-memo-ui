@@ -1,12 +1,9 @@
-export interface ResetPasswordFormValues {
-  password: string;
-  confirmPassword: string;
-}
+import type { ResetPasswordFormType } from "@/models/ResetPasswordFormType";
 
 export interface ResetPasswordPageProps {
-  initialValues: ResetPasswordFormValues;
+  initialValues: ResetPasswordFormType;
   submitted: boolean;
-  onSubmit: (values: ResetPasswordFormValues) => void;
+  onSubmit: (values: ResetPasswordFormType) => void;
   validating: boolean;
   isValidToken: boolean;
 }

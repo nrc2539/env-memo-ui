@@ -7,12 +7,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { useProjectAction } from "@/hooks/actions/useProjectAction";
 import { useProjectEnvAction } from "@/hooks/actions/useProjectEnvAction";
 import { Role } from "@/enums/roleEnum";
-
-import type {
-  ProjectDetailPageProps,
-  EnvGroup,
-  EnvVariable,
-} from "./interface";
+import type { EnvVariableType } from "@/models/EnvVariableType";
+import type { EnvGroupType } from "@/models/EnvGroupType";
+import type { ProjectDetailPageProps } from "./interface";
 
 export default function withProjectDetailPage(
   Component: React.FC<ProjectDetailPageProps>,
@@ -22,7 +19,8 @@ export default function withProjectDetailPage(
     const projectId = params.projectId;
     const projectIdNum = Number(projectId);
 
-    const { deleteProject, updateProject, getProjectDetail } = useProjectAction();
+    const { deleteProject, updateProject, getProjectDetail } =
+      useProjectAction();
     const {
       getEnvGroups,
       createEnvGroup,
@@ -85,7 +83,7 @@ export default function withProjectDetailPage(
       });
     };
 
-    const toggleGroupAll = (group: EnvGroup) => {
+    const toggleGroupAll = (group: EnvGroupType) => {
       const ids = group.variables.map((v) => v.id);
       const allSelected = ids.every((id) => selected.has(id));
       setSelected((prev) => {
@@ -245,7 +243,7 @@ export default function withProjectDetailPage(
         key,
         value,
       }: {
-        variable: EnvVariable;
+        variable: EnvVariableType;
         key: string;
         value: string;
       }) =>
@@ -272,7 +270,7 @@ export default function withProjectDetailPage(
     });
 
     const deleteVariableMutation = useMutation({
-      mutationFn: (variable: EnvVariable) =>
+      mutationFn: (variable: EnvVariableType) =>
         deleteEnvVariable(projectIdNum, variable.envGroupId, variable.id),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: groupsQueryKey });
@@ -318,14 +316,14 @@ export default function withProjectDetailPage(
     );
 
     const onEditVariable = useCallback(
-      async (variable: EnvVariable, key: string, value: string) => {
+      async (variable: EnvVariableType, key: string, value: string) => {
         await editVariableMutation.mutateAsync({ variable, key, value });
       },
       [editVariableMutation],
     );
 
     const onDeleteVariable = useCallback(
-      async (variable: EnvVariable) => {
+      async (variable: EnvVariableType) => {
         await deleteVariableMutation.mutateAsync(variable);
       },
       [deleteVariableMutation],

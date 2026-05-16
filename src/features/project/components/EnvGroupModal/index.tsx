@@ -5,9 +5,10 @@ import { Modal } from "@/components/Modal";
 import { InputField } from "@/components/form/InputField";
 import { IconDeviceFloppy } from "@tabler/icons-react";
 
-import type { EnvGroupModalProps, EnvGroupFormValues } from "./interface";
+import type { EnvGroupFormType } from "@/models/EnvGroupFormType";
+import type { EnvGroupModalProps } from "./interface";
 
-const initialValues: EnvGroupFormValues = { name: "" };
+const initialValues: EnvGroupFormType = { name: "" };
 
 const validationSchema = Yup.object({
   name: Yup.string().trim().required("Group name is required"),

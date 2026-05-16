@@ -1,5 +1,5 @@
-import type { Invitation } from "../../interface";
+import type { InvitationType } from "@/models/InvitationType";
 
 export interface InvitationTableProps {
-  invitations: Invitation[];
+  invitations: InvitationType[];
 }

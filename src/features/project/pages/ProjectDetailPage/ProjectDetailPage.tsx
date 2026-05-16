@@ -19,12 +19,9 @@ import { EnvVariableTable } from "@/features/project/components/EnvVariableTable
 import { VariablePreviewPanel } from "@/features/project/components/VariablePreviewPanel";
 
 import { Role } from "@/enums/roleEnum";
-
-import type {
-  EnvVariable,
-  EnvGroup,
-  ProjectDetailPageProps,
-} from "./interface";
+import type { EnvVariableType } from "@/models/EnvVariableType";
+import type { EnvGroupType } from "@/models/EnvGroupType";
+import type { ProjectDetailPageProps } from "./interface";
 
 export default function ProjectDetailPage({
   projectId,
@@ -55,28 +52,26 @@ export default function ProjectDetailPage({
 
   const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
   const [isEditGroup, setIsEditGroup] = useState(false);
-  const [selectedGroup, setSelectedGroup] = useState<EnvGroup | null>(null);
+  const [selectedGroup, setSelectedGroup] = useState<EnvGroupType | null>(null);
   const [isDeleteGroupModalOpen, setIsDeleteGroupModalOpen] = useState(false);
-  const [groupToDelete, setGroupToDelete] = useState<EnvGroup | null>(null);
+  const [groupToDelete, setGroupToDelete] = useState<EnvGroupType | null>(null);
 
   const [isVariableModalOpen, setIsVariableModalOpen] = useState(false);
   const [isEditVariable, setIsEditVariable] = useState(false);
-  const [selectedVariable, setSelectedVariable] = useState<EnvVariable | null>(
-    null,
-  );
+  const [selectedVariable, setSelectedVariable] =
+    useState<EnvVariableType | null>(null);
   const [selectedVariableGroupId, setSelectedVariableGroupId] = useState<
     string | null
   >(null);
   const [isDeleteVariableModalOpen, setIsDeleteVariableModalOpen] =
     useState(false);
-  const [variableToDelete, setVariableToDelete] = useState<EnvVariable | null>(
-    null,
-  );
+  const [variableToDelete, setVariableToDelete] =
+    useState<EnvVariableType | null>(null);
 
   const isOwner = currentUserRole === Role.OWNER;
   const isViewer = currentUserRole === Role.VIEWER;
 
-  const selectedVars: EnvVariable[] = [];
+  const selectedVars: EnvVariableType[] = [];
   for (const group of groups) {
     for (const v of group.variables) {
       if (selected?.has(v.id)) selectedVars.push(v);
@@ -100,13 +95,13 @@ export default function ProjectDetailPage({
     setIsGroupModalOpen(true);
   }
 
-  function handleOpenEditGroup(group: EnvGroup) {
+  function handleOpenEditGroup(group: EnvGroupType) {
     setIsEditGroup(true);
     setSelectedGroup(group);
     setIsGroupModalOpen(true);
   }
 
-  function handleOpenDeleteGroup(group: EnvGroup) {
+  function handleOpenDeleteGroup(group: EnvGroupType) {
     setGroupToDelete(group);
     setIsDeleteGroupModalOpen(true);
   }
@@ -118,13 +113,13 @@ export default function ProjectDetailPage({
     setIsVariableModalOpen(true);
   }
 
-  function handleOpenEditVariable(variable: EnvVariable) {
+  function handleOpenEditVariable(variable: EnvVariableType) {
     setIsEditVariable(true);
     setSelectedVariable(variable);
     setIsVariableModalOpen(true);
   }
 
-  function handleOpenDeleteVariable(variable: EnvVariable) {
+  function handleOpenDeleteVariable(variable: EnvVariableType) {
     setVariableToDelete(variable);
     setIsDeleteVariableModalOpen(true);
   }
@@ -240,7 +235,9 @@ export default function ProjectDetailPage({
                       onToggleAll={() => onToggleGroupAll(group)}
                       onToggleVar={onToggleVar}
                       onEdit={!isViewer ? handleOpenEditVariable : undefined}
-                      onDelete={!isViewer ? handleOpenDeleteVariable : undefined}
+                      onDelete={
+                        !isViewer ? handleOpenDeleteVariable : undefined
+                      }
                     />
                   </Accordion>
                 );
@@ -356,11 +353,7 @@ export default function ProjectDetailPage({
           }
           onSubmit={async (values) => {
             if (isEditVariable && selectedVariable && onEditVariable) {
-              await onEditVariable(
-                selectedVariable,
-                values.key,
-                values.value,
-              );
+              await onEditVariable(selectedVariable, values.key, values.value);
             } else if (selectedVariableGroupId && onCreateVariable) {
               await onCreateVariable(
                 selectedVariableGroupId,

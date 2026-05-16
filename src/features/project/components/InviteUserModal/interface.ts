@@ -1,13 +1,9 @@
 import type { Role } from "@/enums/roleEnum";
-
-export interface InviteUserFormValues {
-  email: string;
-  role: string;
-}
+import type { InviteUserFormType } from "@/models/InviteUserFormType";
 
 export interface InviteUserModalProps {
   isOpen: boolean;
   availableRoles: Role[];
-  onSubmit: (values: InviteUserFormValues) => Promise<void>;
+  onSubmit: (values: InviteUserFormType) => Promise<void>;
   onCancel: () => void;
 }

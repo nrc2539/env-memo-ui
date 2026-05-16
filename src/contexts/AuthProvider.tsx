@@ -8,7 +8,8 @@ import {
   registerLogoutHandler,
 } from "../libs/api/client";
 import { useAuthAction } from "@/hooks/actions/useAuthAction";
-import { AuthContext, type UserProfile } from "./AuthContext";
+import type { UserProfileType } from "@/models/UserProfileType";
+import { AuthContext } from "./AuthContext";
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -47,7 +48,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     <AuthContext.Provider
       value={{
         isAuthenticated,
-        user: (user as UserProfile | undefined) ?? null,
+        user: (user as UserProfileType | undefined) ?? null,
         setToken,
         clearUserData,
       }}

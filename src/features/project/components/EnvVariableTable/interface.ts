@@ -1,10 +1,10 @@
-import type { EnvVariable } from "@/features/project/pages/ProjectDetailPage/interface";
+import type { EnvVariableType } from "@/models/EnvVariableType";
 
 export interface EnvVariableTableProps {
-  variables: EnvVariable[];
+  variables: EnvVariableType[];
   selected?: Set<string>;
   onToggleAll: () => void;
   onToggleVar: (id: string) => void;
-  onEdit?: (variable: EnvVariable) => void;
-  onDelete?: (variable: EnvVariable) => void;
+  onEdit?: (variable: EnvVariableType) => void;
+  onDelete?: (variable: EnvVariableType) => void;
 }

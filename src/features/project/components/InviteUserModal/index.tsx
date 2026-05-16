@@ -9,9 +9,10 @@ import { DropdownField } from "@/components/form/DropdownField";
 import type { Role } from "@/enums/roleEnum";
 import type { SelectType } from "@/interfaces/SelectType";
 
-import type { InviteUserModalProps, InviteUserFormValues } from "./interface";
+import type { InviteUserFormType } from "@/models/InviteUserFormType";
+import type { InviteUserModalProps } from "./interface";
 
-const initialValues: InviteUserFormValues = { email: "", role: "" };
+const initialValues: InviteUserFormType = { email: "", role: "" };
 
 const validationSchema = Yup.object({
   email: Yup.string().email("Invalid email").required("Email is required"),

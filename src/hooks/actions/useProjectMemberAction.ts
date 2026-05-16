@@ -1,11 +1,9 @@
 import { useApiClient } from "@/hooks/useApiClient";
 
-import type {
-  ProjectMember,
-  Invitation,
-} from "@/features/project/pages/ProjectMemberPage/interface";
+import type { ProjectMemberType } from "@/models/ProjectMemberType";
+import type { InvitationType } from "@/models/InvitationType";
 import type { InvitationStatus } from "@/enums/invitationStatusEnum";
-import type { PaginatedResponse } from "@/interfaces/PaginatedResponse";
+import type { PaginatedResponseType } from "@/models/PaginatedResponseType";
 import type { PaginationType } from "@/interfaces/PaginationType";
 
 export function useProjectMemberAction() {
@@ -25,8 +23,8 @@ export function useProjectMemberAction() {
   async function getProjectMembers(
     projectId: number,
     params?: PaginationType,
-  ): Promise<PaginatedResponse<ProjectMember>> {
-    const { data } = await apiClient.get<PaginatedResponse<ProjectMember>>(
+  ): Promise<PaginatedResponseType<ProjectMemberType>> {
+    const { data } = await apiClient.get<PaginatedResponseType<ProjectMemberType>>(
       `/projects/${projectId}/members`,
       { params },
     );
@@ -36,8 +34,8 @@ export function useProjectMemberAction() {
   async function getProjectInvitations(
     projectId: number,
     params?: PaginationType & { status?: InvitationStatus },
-  ): Promise<PaginatedResponse<Invitation>> {
-    const { data } = await apiClient.get<PaginatedResponse<Invitation>>(
+  ): Promise<PaginatedResponseType<InvitationType>> {
+    const { data } = await apiClient.get<PaginatedResponseType<InvitationType>>(
       `/projects/${projectId}/invitations`,
       { params },
     );

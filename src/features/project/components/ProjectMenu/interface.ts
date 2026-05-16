@@ -1,4 +1,4 @@
-import type { Project } from "@/features/project/pages/ProjectListPage/interface";
+import type { ProjectType } from "@/models/ProjectType";
 
 export interface ProjectMenuViewProps {
   isOpen: boolean;
@@ -8,7 +8,7 @@ export interface ProjectMenuViewProps {
 }
 
 export interface WithProjectMenuProps {
-  project: Project;
-  onEdit: (project: Project) => void;
-  onDelete: (project: Project) => void;
+  project: ProjectType;
+  onEdit: (project: ProjectType) => void;
+  onDelete: (project: ProjectType) => void;
 }

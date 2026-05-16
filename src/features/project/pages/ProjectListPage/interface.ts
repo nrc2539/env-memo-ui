@@ -1,13 +1,4 @@
-import type { Role } from "@/enums/roleEnum";
-
-export interface Project {
-  id: number;
-  name: string;
-  description: string | null;
-  createdAt: string;
-  updatedAt: string;
-  role?: Role;
-}
+import type { ProjectType } from "@/models/ProjectType";
 
 export type ProjectListSearchParams = {
   page: number;
@@ -15,18 +6,18 @@ export type ProjectListSearchParams = {
 };
 
 export interface ProjectListPageViewProps {
-  displayProjects: Project[];
+  displayProjects: ProjectType[];
   isLoading: boolean;
   page: number;
   totalPages: number;
   search: string;
   isModalOpen: boolean;
   isEdit: boolean;
-  selectedProject: Project | null;
+  selectedProject: ProjectType | null;
   isDeleteModalOpen: boolean;
   onCreateNew: () => void;
-  onEdit: (project: Project) => void;
-  onDelete: (project: Project) => void;
+  onEdit: (project: ProjectType) => void;
+  onDelete: (project: ProjectType) => void;
   onSubmit: (values: { name: string; description: string }) => Promise<void>;
   onConfirmDelete: () => void;
   onCloseModal: () => void;

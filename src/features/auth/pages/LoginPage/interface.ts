@@ -1,9 +1,6 @@
-export interface LoginFormValues {
-  email: string;
-  password: string;
-}
+import type { LoginFormType } from "@/models/LoginFormType";
 
 export interface LoginPageProps {
-  initialValues: LoginFormValues;
-  onSubmit: (values: LoginFormValues) => Promise<void>;
+  initialValues: LoginFormType;
+  onSubmit: (values: LoginFormType) => Promise<void>;
 }

@@ -4,7 +4,8 @@ import type { FormikHelpers } from "formik";
 import { useAlert } from "@/hooks/useAlert";
 import { useAuth } from "@/hooks/useAuth";
 import { useAuthAction } from "@/hooks/actions/useAuthAction";
-import type { SettingPageProps, ChangePasswordFormValues } from "./interface";
+import type { ChangePasswordFormType } from "@/models/ChangePasswordFormType";
+import type { SettingPageProps } from "./interface";
 
 export default function withSettingPage(Component: React.FC<SettingPageProps>) {
   function WithSettingPage() {
@@ -22,16 +23,16 @@ export default function withSettingPage(Component: React.FC<SettingPageProps>) {
       }) => changePassword(currentPassword, newPassword),
     });
 
-    const initialValues: ChangePasswordFormValues = {
+    const initialValues: ChangePasswordFormType = {
       currentPassword: "",
       newPassword: "",
       confirmPassword: "",
     };
 
-    const handleSubmit = async (
-      values: ChangePasswordFormValues,
-      formikHelper: FormikHelpers<ChangePasswordFormValues>,
-    ) => {
+    async function handleSubmit(
+      values: ChangePasswordFormType,
+      formikHelper: FormikHelpers<ChangePasswordFormType>,
+    ) {
       await changePasswordMutation.mutateAsync(
         {
           currentPassword: values.currentPassword,
@@ -53,7 +54,7 @@ export default function withSettingPage(Component: React.FC<SettingPageProps>) {
           },
         },
       );
-    };
+    }
 
     return (
       <Component

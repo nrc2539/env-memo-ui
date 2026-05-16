@@ -1,12 +1,9 @@
-export interface ProjectFormValues {
-  name: string;
-  description: string;
-}
+import type { ProjectFormType } from "@/models/ProjectFormType";
 
 export interface ProjectModalProps {
   isOpen: boolean;
   isEdit: boolean;
-  initialValues?: ProjectFormValues;
-  onSubmit: (values: ProjectFormValues) => Promise<void>;
+  initialValues?: ProjectFormType;
+  onSubmit: (values: ProjectFormType) => Promise<void>;
   onCancel: () => void;
 }

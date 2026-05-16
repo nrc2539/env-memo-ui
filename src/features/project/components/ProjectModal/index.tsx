@@ -5,9 +5,10 @@ import { Modal } from "@/components/Modal";
 import { InputField } from "@/components/form/InputField";
 import { IconDeviceFloppy } from "@tabler/icons-react";
 
-import type { ProjectModalProps, ProjectFormValues } from "./interface";
+import type { ProjectFormType } from "@/models/ProjectFormType";
+import type { ProjectModalProps } from "./interface";
 
-const initialValues: ProjectFormValues = { name: "", description: "" };
+const initialValues: ProjectFormType = { name: "", description: "" };
 
 const validationSchema = Yup.object({
   name: Yup.string().trim().required("Project name is required"),

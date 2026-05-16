@@ -1,4 +1,5 @@
 import { useApiClient } from "@/hooks/useApiClient";
+import type { UserProfileType } from "@/models/UserProfileType";
 
 interface VerifyTokenResponse {
   id: number;
@@ -74,14 +75,8 @@ export function useAuthAction() {
     });
   }
 
-  interface UserProfile {
-    id: number;
-    email: string;
-    name: string;
-  }
-
-  async function getProfile(): Promise<UserProfile> {
-    const { data } = await apiClient.get<UserProfile>("/auth/profile");
+  async function getProfile(): Promise<UserProfileType> {
+    const { data } = await apiClient.get<UserProfileType>("/auth/profile");
     return data;
   }
 

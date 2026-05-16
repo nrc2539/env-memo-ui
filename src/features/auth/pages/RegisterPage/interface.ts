@@ -1,11 +1,6 @@
-export interface RegisterFormValues {
-  name: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
+import type { RegisterFormType } from "@/models/RegisterFormType";
 
 export interface RegisterPageProps {
-  initialValues: RegisterFormValues;
-  onSubmit: (values: RegisterFormValues) => Promise<void>;
+  initialValues: RegisterFormType;
+  onSubmit: (values: RegisterFormType) => Promise<void>;
 }

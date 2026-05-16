@@ -1,16 +1,11 @@
 import type { FormikHelpers } from "formik";
-
-export interface ChangePasswordFormValues {
-  currentPassword: string;
-  newPassword: string;
-  confirmPassword: string;
-}
+import type { ChangePasswordFormType } from "@/models/ChangePasswordFormType";
 
 export interface SettingPageProps {
   user: { name: string; email: string } | null;
-  initialValues: ChangePasswordFormValues;
+  initialValues: ChangePasswordFormType;
   onSubmit: (
-    values: ChangePasswordFormValues,
-    formikHelper: FormikHelpers<ChangePasswordFormValues>,
+    values: ChangePasswordFormType,
+    formikHelper: FormikHelpers<ChangePasswordFormType>,
   ) => Promise<void>;
 }

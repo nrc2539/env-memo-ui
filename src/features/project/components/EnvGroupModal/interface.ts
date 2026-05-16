@@ -1,11 +1,9 @@
-export interface EnvGroupFormValues {
-  name: string;
-}
+import type { EnvGroupFormType } from "@/models/EnvGroupFormType";
 
 export interface EnvGroupModalProps {
   isOpen: boolean;
   isEdit: boolean;
-  initialValues?: EnvGroupFormValues;
-  onSubmit: (values: EnvGroupFormValues) => Promise<void>;
+  initialValues?: EnvGroupFormType;
+  onSubmit: (values: EnvGroupFormType) => Promise<void>;
   onCancel: () => void;
 }

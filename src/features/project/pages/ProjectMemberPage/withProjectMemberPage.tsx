@@ -11,11 +11,11 @@ import { useProjectMemberAction } from "@/hooks/actions/useProjectMemberAction";
 import { Role } from "@/enums/roleEnum";
 import { InvitationStatus } from "@/enums/invitationStatusEnum";
 
+import type { ProjectMemberType } from "@/models/ProjectMemberType";
+import type { InvitationType } from "@/models/InvitationType";
 import type {
   ProjectMemberSearchParams,
   ProjectMemberPageViewProps,
-  ProjectMember,
-  Invitation,
 } from "./interface";
 
 export default function withProjectMemberPage(
@@ -48,7 +48,7 @@ export default function withProjectMemberPage(
     const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
     const [isDeleteMemberModalOpen, setIsDeleteMemberModalOpen] =
       useState(false);
-    const [selectedMember, setSelectedMember] = useState<ProjectMember | null>(
+    const [selectedMember, setSelectedMember] = useState<ProjectMemberType | null>(
       null,
     );
 
@@ -77,7 +77,7 @@ export default function withProjectMemberPage(
     });
 
     const members = membersData?.data ?? projectDetail?.members ?? [];
-    const invitations: Invitation[] = invitationsData?.data ?? [];
+    const invitations: InvitationType[] = invitationsData?.data ?? [];
     const totalPages = membersData?.meta?.totalPages ?? 1;
 
     const isLoading = !projectDetail || isLoadingMembers;
@@ -142,7 +142,7 @@ export default function withProjectMemberPage(
       [inviteMutation],
     );
 
-    const handleRemoveMember = useCallback((member: ProjectMember) => {
+    const handleRemoveMember = useCallback((member: ProjectMemberType) => {
       setSelectedMember(member);
       setIsDeleteMemberModalOpen(true);
     }, []);

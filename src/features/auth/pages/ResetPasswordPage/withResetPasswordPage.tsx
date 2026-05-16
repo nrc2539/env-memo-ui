@@ -4,7 +4,8 @@ import { useSearchParams } from "react-router";
 
 import { useAuthAction } from "@/hooks/actions/useAuthAction";
 
-import type { ResetPasswordFormValues, ResetPasswordPageProps } from "./interface";
+import type { ResetPasswordFormType } from "@/models/ResetPasswordFormType";
+import type { ResetPasswordPageProps } from "./interface";
 
 export default function withResetPasswordPage(
   Component: React.FC<ResetPasswordPageProps>,
@@ -31,12 +32,12 @@ export default function withResetPasswordPage(
       },
     });
 
-    const initialValues: ResetPasswordFormValues = {
+    const initialValues: ResetPasswordFormType = {
       password: "",
       confirmPassword: "",
     };
 
-    async function onSubmit(values: ResetPasswordFormValues) {
+    async function onSubmit(values: ResetPasswordFormType) {
       await resetPasswordMutation.mutateAsync(values.password);
     }
 

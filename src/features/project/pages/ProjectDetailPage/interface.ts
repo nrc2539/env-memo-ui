@@ -1,37 +1,12 @@
 import type { Role } from "@/enums/roleEnum";
-import type { ProjectMember } from "@/features/project/pages/ProjectMemberPage/interface";
 
-export interface EnvVariable {
-  id: string;
-  key: string;
-  value: string;
-  envGroupId: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface EnvGroup {
-  id: string;
-  name: string;
-  projectId: number;
-  createdAt: string;
-  updatedAt: string;
-  variables: EnvVariable[];
-}
-
-export interface ProjectDetail {
-  id: number;
-  name: string;
-  description: string | null;
-  createdAt: string;
-  updatedAt: string;
-  members: ProjectMember[];
-}
+import type { EnvVariableType } from "@/models/EnvVariableType";
+import type { EnvGroupType } from "@/models/EnvGroupType";
 
 export interface ProjectDetailPageProps {
   projectId?: string;
   projectName?: string;
-  groups?: EnvGroup[];
+  groups?: EnvGroupType[];
   expanded?: Set<string>;
   selected?: Set<string>;
   panelOpen?: boolean;
@@ -39,7 +14,7 @@ export interface ProjectDetailPageProps {
   currentUserRole: Role;
   onToggleGroup: (id: string) => void;
   onToggleVar: (id: string) => void;
-  onToggleGroupAll: (group: EnvGroup) => void;
+  onToggleGroupAll: (group: EnvGroupType) => void;
   onCopyToClipboard: (text: string, msg?: string) => Promise<void>;
   onSetPanelOpen: (open: boolean) => void;
   onEditProject?: (name: string, description: string | null) => Promise<void>;
@@ -48,6 +23,6 @@ export interface ProjectDetailPageProps {
   onEditGroup?: (id: string, name: string) => Promise<void>;
   onDeleteGroup?: (id: string) => Promise<void>;
   onCreateVariable?: (groupId: string, key: string, value: string) => Promise<void>;
-  onEditVariable?: (variable: EnvVariable, key: string, value: string) => Promise<void>;
-  onDeleteVariable?: (variable: EnvVariable) => Promise<void>;
+  onEditVariable?: (variable: EnvVariableType, key: string, value: string) => Promise<void>;
+  onDeleteVariable?: (variable: EnvVariableType) => Promise<void>;
 }

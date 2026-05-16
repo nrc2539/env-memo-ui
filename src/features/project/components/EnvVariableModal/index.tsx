@@ -5,9 +5,10 @@ import { Modal } from "@/components/Modal";
 import { InputField } from "@/components/form/InputField";
 import { IconDeviceFloppy } from "@tabler/icons-react";
 
-import type { EnvVariableModalProps, EnvVariableFormValues } from "./interface";
+import type { EnvVariableFormType } from "@/models/EnvVariableFormType";
+import type { EnvVariableModalProps } from "./interface";
 
-const initialValues: EnvVariableFormValues = { key: "", value: "" };
+const initialValues: EnvVariableFormType = { key: "", value: "" };
 
 const validationSchema = Yup.object({
   key: Yup.string()

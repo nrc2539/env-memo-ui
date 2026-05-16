@@ -4,7 +4,8 @@ import { useAlert } from "@/hooks/useAlert";
 import { useAuthAction } from "@/hooks/actions/useAuthAction";
 import { useAuth } from "@/hooks/useAuth";
 
-import type { LoginFormValues, LoginPageProps } from "./interface";
+import type { LoginFormType } from "@/models/LoginFormType";
+import type { LoginPageProps } from "./interface";
 
 export default function withLoginPage(Component: React.FC<LoginPageProps>) {
   function WithLoginPage() {
@@ -13,7 +14,7 @@ export default function withLoginPage(Component: React.FC<LoginPageProps>) {
     const { setToken } = useAuth();
 
     const loginMutation = useMutation({
-      mutationFn: ({ email, password }: LoginFormValues) =>
+      mutationFn: ({ email, password }: LoginFormType) =>
         login(email, password),
       onSuccess: (data) => {
         setToken(data.accessToken, data.refreshToken);
@@ -21,17 +22,17 @@ export default function withLoginPage(Component: React.FC<LoginPageProps>) {
       onError: () => {
         showError({
           message: "Login failed",
-          description: "Invalid email or password.",
+          description: "Invalid email or password. Please try again.",
         });
       },
     });
 
-    const initialValues: LoginFormValues = {
+    const initialValues: LoginFormType = {
       email: "",
       password: "",
     };
 
-    async function onSubmit(values: LoginFormValues) {
+    async function onSubmit(values: LoginFormType) {
       await loginMutation.mutateAsync(values);
     }
 
