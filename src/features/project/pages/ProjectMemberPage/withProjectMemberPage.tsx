@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAlert } from "@/hooks/useAlert";
 import { useAuth } from "@/hooks/useAuth";
 import { useProjectEnvAction } from "@/hooks/actions/useProjectEnvAction";
+import { useProjectMemberAction } from "@/hooks/actions/useProjectMemberAction";
 import { Role } from "@/enums/roleEnum";
 
 import type {
@@ -25,13 +26,13 @@ export default function withProjectMemberPage(
     const { user: authUser } = useAuth();
     const currentUserId = authUser?.id;
 
+    const { getProjectDetail } = useProjectEnvAction();
     const {
-      getProjectDetail,
       getProjectMembers,
       getProjectInvitations,
       inviteUserToProject,
       removeProjectMember,
-    } = useProjectEnvAction();
+    } = useProjectMemberAction();
 
     const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
     const [isDeleteMemberModalOpen, setIsDeleteMemberModalOpen] = useState(false);
