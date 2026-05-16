@@ -9,6 +9,21 @@ export interface Project {
   role?: Role;
 }
 
-export interface ProjectListPageProps {
-  projects?: Project[];
+export interface ProjectListPageViewProps {
+  displayProjects: Project[];
+  isLoading: boolean;
+  page: number;
+  totalPages: number;
+  isModalOpen: boolean;
+  isEdit: boolean;
+  selectedProject: Project | null;
+  isDeleteModalOpen: boolean;
+  onCreateNew: () => void;
+  onEdit: (project: Project) => void;
+  onDelete: (project: Project) => void;
+  onSubmit: (values: { name: string; description: string }) => Promise<void>;
+  onConfirmDelete: () => void;
+  onCloseModal: () => void;
+  onCancelDelete: () => void;
+  onPageChange: (page: number) => void;
 }
