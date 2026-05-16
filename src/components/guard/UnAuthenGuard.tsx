@@ -13,13 +13,7 @@ export default function UnAuthenGuard({ children }: UnAuthenGuardProps) {
 
   useEffect(() => {
     if (isAuthenticated) {
-      const redirect = sessionStorage.getItem("redirectAfterLogin");
-      if (redirect) {
-        sessionStorage.removeItem("redirectAfterLogin");
-        navigate(redirect, { replace: true });
-      } else {
-        navigate("/projects", { replace: true });
-      }
+      navigate("/projects", { replace: true });
     }
   }, [isAuthenticated, navigate]);
 
