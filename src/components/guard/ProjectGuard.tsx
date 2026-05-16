@@ -5,7 +5,7 @@ import { isAxiosError } from "axios";
 
 import { useAuth } from "@/hooks/useAuth";
 import { useAlert } from "@/hooks/useAlert";
-import { useProjectEnvAction } from "@/hooks/actions/useProjectEnvAction";
+import { useProjectAction } from "@/hooks/actions/useProjectAction";
 import { Loading } from "@/components/Loading";
 
 interface ProjectGuardProps {
@@ -18,7 +18,7 @@ export default function ProjectGuard({ children }: ProjectGuardProps) {
   const { user } = useAuth();
   const { info, error: showError } = useAlert();
   const navigate = useNavigate();
-  const { getProjectDetail } = useProjectEnvAction();
+  const { getProjectDetail } = useProjectAction();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["project", projectIdNum],

@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { useAlert } from "@/hooks/useAlert";
 import { useAuth } from "@/hooks/useAuth";
-import { useProjectEnvAction } from "@/hooks/actions/useProjectEnvAction";
+import { useProjectAction } from "@/hooks/actions/useProjectAction";
 import { useProjectMemberAction } from "@/hooks/actions/useProjectMemberAction";
 import { Role } from "@/enums/roleEnum";
 
@@ -26,7 +26,7 @@ export default function withProjectMemberPage(
     const { user: authUser } = useAuth();
     const currentUserId = authUser?.id;
 
-    const { getProjectDetail } = useProjectEnvAction();
+    const { getProjectDetail } = useProjectAction();
     const {
       getProjectMembers,
       getProjectInvitations,

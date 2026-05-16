@@ -22,9 +22,8 @@ export default function withProjectDetailPage(
     const projectId = params.projectId;
     const projectIdNum = Number(projectId);
 
-    const { deleteProject, updateProject } = useProjectAction();
+    const { deleteProject, updateProject, getProjectDetail } = useProjectAction();
     const {
-      getProjectDetail,
       getEnvGroups,
       createEnvGroup,
       updateEnvGroup,

@@ -3,20 +3,10 @@ import { useApiClient } from "@/hooks/useApiClient";
 import type {
   EnvGroup,
   EnvVariable,
-  ProjectDetail,
 } from "@/features/project/pages/ProjectDetailPage/interface";
 
 export function useProjectEnvAction() {
   const apiClient = useApiClient();
-
-  async function getProjectDetail(
-    projectId: number,
-  ): Promise<ProjectDetail> {
-    const { data } = await apiClient.get<ProjectDetail>(
-      `/projects/${projectId}`,
-    );
-    return data;
-  }
 
   async function getEnvGroups(projectId: number): Promise<EnvGroup[]> {
     const { data } = await apiClient.get<{ data: EnvGroup[] }>(
@@ -96,7 +86,6 @@ export function useProjectEnvAction() {
   }
 
   return {
-    getProjectDetail,
     getEnvGroups,
     createEnvGroup,
     updateEnvGroup,

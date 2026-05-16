@@ -1,6 +1,7 @@
 import { useApiClient } from "@/hooks/useApiClient";
 import type { PaginatedResponse } from "@/interfaces/PaginatedResponse";
 import type { Project } from "@/features/project/pages/ProjectListPage/interface";
+import type { ProjectDetail } from "@/features/project/pages/ProjectDetailPage/interface";
 
 export function useProjectAction() {
   const apiClient = useApiClient();
@@ -48,11 +49,21 @@ export function useProjectAction() {
     return data;
   }
 
+  async function getProjectDetail(
+    projectId: number,
+  ): Promise<ProjectDetail> {
+    const { data } = await apiClient.get<ProjectDetail>(
+      `/projects/${projectId}`,
+    );
+    return data;
+  }
+
   return {
     getProjects,
     createProject,
     updateProject,
     deleteProject,
     getProject,
+    getProjectDetail,
   };
 }
