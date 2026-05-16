@@ -4,6 +4,7 @@ import * as Yup from "yup";
 
 import AuthLayout from "@/components/layout/AuthLayout";
 import { InputField } from "@/components/form/InputField";
+import PasswordInputField from "@/components/form/PasswordInputField";
 import { passwordRegx } from "@/libs/constant";
 
 import type { RegisterPageProps } from "./interface";
@@ -49,17 +50,15 @@ export default function RegisterPage({
                 autoComplete="email"
                 placeholder="Enter your email"
               />
-              <InputField
+              <PasswordInputField
                 name="password"
                 label="Password"
-                type="password"
                 autoComplete="new-password"
                 placeholder="Create a password"
               />
-              <InputField
+              <PasswordInputField
                 name="confirmPassword"
                 label="Confirm password"
-                type="password"
                 autoComplete="new-password"
                 placeholder="Confirm your password"
               />

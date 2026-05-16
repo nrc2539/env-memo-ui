@@ -9,6 +9,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
       errorMessage,
       className,
       leftIcon,
+      rightIcon,
       label,
       labelClassName,
       showError = true,
@@ -43,6 +44,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             )}
             {...props}
           />
+          {rightIcon}
         </div>
         {showError && (
           <div className={cn({ invisible: !errorMessage })}>

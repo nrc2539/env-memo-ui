@@ -1,7 +1,7 @@
 import { Form, Formik } from "formik";
 import * as Yup from "yup";
 
-import { InputField } from "@/components/form/InputField";
+import PasswordInputField from "@/components/form/PasswordInputField";
 import { passwordRegx } from "@/libs/constant";
 
 import type { SettingPageProps } from "./interface";
@@ -54,24 +54,21 @@ export default function SettingPage({
         >
           {({ isSubmitting }) => (
             <Form className="mt-6 space-y-5">
-              <InputField
+              <PasswordInputField
                 name="currentPassword"
                 label="Current password"
-                type="password"
                 autoComplete="current-password"
                 placeholder="Enter current password"
               />
-              <InputField
+              <PasswordInputField
                 name="newPassword"
                 label="New password"
-                type="password"
                 autoComplete="new-password"
                 placeholder="Enter new password"
               />
-              <InputField
+              <PasswordInputField
                 name="confirmPassword"
                 label="Confirm new password"
-                type="password"
                 autoComplete="new-password"
                 placeholder="Confirm new password"
               />

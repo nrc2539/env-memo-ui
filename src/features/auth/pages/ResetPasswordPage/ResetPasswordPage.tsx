@@ -8,7 +8,7 @@ import {
 } from "@tabler/icons-react";
 
 import AuthLayout from "@/components/layout/AuthLayout";
-import { InputField } from "@/components/form/InputField";
+import PasswordInputField from "@/components/form/PasswordInputField";
 import { passwordRegx } from "@/libs/constant";
 
 import type { ResetPasswordPageProps } from "./interface";
@@ -110,17 +110,15 @@ export default function ResetPasswordPage({
         {({ isSubmitting }) => (
           <Form>
             <div className="mt-8 mb-2">
-              <InputField
+              <PasswordInputField
                 name="password"
                 label="New password"
-                type="password"
                 autoComplete="new-password"
                 placeholder="Enter new password"
               />
-              <InputField
+              <PasswordInputField
                 name="confirmPassword"
                 label="Confirm password"
-                type="password"
                 autoComplete="new-password"
                 placeholder="Confirm new password"
               />

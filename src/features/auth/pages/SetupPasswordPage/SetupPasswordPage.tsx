@@ -9,6 +9,7 @@ import {
 
 import AuthLayout from "@/components/layout/AuthLayout";
 import { InputField } from "@/components/form/InputField";
+import PasswordInputField from "@/components/form/PasswordInputField";
 import { passwordRegx } from "@/libs/constant";
 
 import type { SetupPasswordPageProps } from "./interface";
@@ -125,17 +126,15 @@ export default function SetupPasswordPage({
                 disabled
                 autoComplete="email"
               />
-              <InputField
+              <PasswordInputField
                 name="password"
                 label="Password"
-                type="password"
                 autoComplete="new-password"
                 placeholder="Create a password"
               />
-              <InputField
+              <PasswordInputField
                 name="confirmPassword"
                 label="Confirm password"
-                type="password"
                 autoComplete="new-password"
                 placeholder="Confirm your password"
               />

@@ -3,6 +3,7 @@ import { Form, Formik } from "formik";
 import * as Yup from "yup";
 
 import { InputField } from "@/components/form/InputField";
+import PasswordInputField from "@/components/form/PasswordInputField";
 import AuthLayout from "@/components/layout/AuthLayout";
 
 import type { LoginPageProps } from "./interface";
@@ -35,10 +36,9 @@ export default function LoginPage({ initialValues, onSubmit }: LoginPageProps) {
                 placeholder="Enter your email"
               />
               <div>
-                <InputField
+                <PasswordInputField
                   name="password"
                   label="Password"
-                  type="password"
                   autoComplete="current-password"
                   placeholder="Enter your password"
                 />
