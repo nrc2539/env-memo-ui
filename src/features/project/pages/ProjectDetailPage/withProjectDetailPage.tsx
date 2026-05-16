@@ -32,7 +32,6 @@ export default function withProjectDetailPage(
       createEnvVariable,
       updateEnvVariable,
       deleteEnvVariable,
-      inviteUserToProject,
     } = useProjectEnvAction();
     const alert = useAlert();
     const navigate = useNavigate();
@@ -291,23 +290,6 @@ export default function withProjectDetailPage(
       },
     });
 
-    const inviteUserMutation = useMutation({
-      mutationFn: ({ email, role }: { email: string; role: string }) =>
-        inviteUserToProject(projectIdNum, email, role as Role),
-      onSuccess: () => {
-        alert.success({
-          message: "User invited",
-          description: "Invitation has been sent.",
-        });
-      },
-      onError: () => {
-        alert.error({
-          message: "Invite failed",
-          description: "Please try again.",
-        });
-      },
-    });
-
     const onCreateGroup = useCallback(
       async (name: string) => {
         await createGroupMutation.mutateAsync(name);
@@ -350,13 +332,6 @@ export default function withProjectDetailPage(
       [deleteVariableMutation],
     );
 
-    const onInviteUser = useCallback(
-      async (email: string, role: Role) => {
-        await inviteUserMutation.mutateAsync({ email, role });
-      },
-      [inviteUserMutation],
-    );
-
     const componentProps: ProjectDetailPageProps = {
       projectId,
       projectName: projectDetail?.name ?? "Loading...",
@@ -379,7 +354,6 @@ export default function withProjectDetailPage(
       onCreateVariable,
       onEditVariable,
       onDeleteVariable,
-      onInviteUser,
     };
 
     return <Component {...componentProps} />;

@@ -5,6 +5,11 @@ import type {
   EnvVariable,
   ProjectDetail,
 } from "@/features/project/pages/ProjectDetailPage/interface";
+import type {
+  ProjectMember,
+  Invitation,
+} from "@/features/project/pages/ProjectMemberPage/interface";
+import type { PaginatedResponse } from "@/interfaces/PaginatedResponse";
 
 export function useProjectEnvAction() {
   const apiClient = useApiClient();
@@ -106,6 +111,39 @@ export function useProjectEnvAction() {
     });
   }
 
+  async function getProjectMembers(
+    projectId: number,
+    page = 1,
+    limitPerPage = 100,
+  ): Promise<PaginatedResponse<ProjectMember>> {
+    const { data } = await apiClient.get<PaginatedResponse<ProjectMember>>(
+      `/projects/${projectId}/members`,
+      { params: { page, limitPerPage } },
+    );
+    return data;
+  }
+
+  async function getProjectInvitations(
+    projectId: number,
+    page = 1,
+    limitPerPage = 100,
+  ): Promise<PaginatedResponse<Invitation>> {
+    const { data } = await apiClient.get<PaginatedResponse<Invitation>>(
+      `/projects/${projectId}/invitations`,
+      { params: { page, limitPerPage } },
+    );
+    return data;
+  }
+
+  async function removeProjectMember(
+    projectId: number,
+    userId: number,
+  ): Promise<void> {
+    await apiClient.delete(
+      `/projects/${projectId}/members/${userId}`,
+    );
+  }
+
   return {
     getProjectDetail,
     getEnvGroups,
@@ -116,5 +154,8 @@ export function useProjectEnvAction() {
     updateEnvVariable,
     deleteEnvVariable,
     inviteUserToProject,
+    getProjectMembers,
+    getProjectInvitations,
+    removeProjectMember,
   };
 }

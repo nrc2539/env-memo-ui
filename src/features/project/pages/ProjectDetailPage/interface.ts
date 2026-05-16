@@ -1,4 +1,5 @@
 import type { Role } from "@/enums/roleEnum";
+import type { ProjectMember } from "@/features/project/pages/ProjectMemberPage/interface";
 
 export interface EnvVariable {
   id: string;
@@ -16,19 +17,6 @@ export interface EnvGroup {
   createdAt: string;
   updatedAt: string;
   variables: EnvVariable[];
-}
-
-interface ProjectMember {
-  id: string;
-  role: Role;
-  userId: number;
-  projectId: number;
-  createdAt: string;
-  user: {
-    id: number;
-    email: string;
-    name: string;
-  };
 }
 
 export interface ProjectDetail {
@@ -62,5 +50,4 @@ export interface ProjectDetailPageProps {
   onCreateVariable?: (groupId: string, key: string, value: string) => Promise<void>;
   onEditVariable?: (variable: EnvVariable, key: string, value: string) => Promise<void>;
   onDeleteVariable?: (variable: EnvVariable) => Promise<void>;
-  onInviteUser?: (email: string, role: Role) => Promise<void>;
 }

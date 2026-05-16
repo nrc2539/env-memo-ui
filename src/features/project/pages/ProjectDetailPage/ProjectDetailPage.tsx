@@ -1,10 +1,11 @@
 import { useState } from "react";
+import { Link } from "react-router";
 import {
   IconPlus,
   IconEdit,
   IconTrash,
-  IconUserPlus,
   IconEye,
+  IconUsers,
 } from "@tabler/icons-react";
 
 import { Breadcrumb } from "@/components/Breadcrumb";
@@ -17,8 +18,7 @@ import { EnvVariableModal } from "@/features/project/components/EnvVariableModal
 import { EnvVariableTable } from "@/features/project/components/EnvVariableTable";
 import { VariablePreviewPanel } from "@/features/project/components/VariablePreviewPanel";
 
-import { InviteUserModal } from "@/features/project/components/InviteUserModal";
-import { getAvailableRoles, Role } from "@/enums/roleEnum";
+import { Role } from "@/enums/roleEnum";
 
 import type {
   EnvVariable,
@@ -48,7 +48,6 @@ export default function ProjectDetailPage({
   onCreateVariable,
   onEditVariable,
   onDeleteVariable,
-  onInviteUser,
 }: ProjectDetailPageProps) {
   const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
   const [isDeleteProjectModalOpen, setIsDeleteProjectModalOpen] =
@@ -73,8 +72,6 @@ export default function ProjectDetailPage({
   const [variableToDelete, setVariableToDelete] = useState<EnvVariable | null>(
     null,
   );
-
-  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
   const isOwner = currentUserRole === Role.OWNER;
   const isViewer = currentUserRole === Role.VIEWER;
@@ -132,10 +129,6 @@ export default function ProjectDetailPage({
     setIsDeleteVariableModalOpen(true);
   }
 
-  function handleOpenInviteModal() {
-    setIsInviteModalOpen(true);
-  }
-
   return (
     <>
       {toast && (
@@ -178,18 +171,15 @@ export default function ProjectDetailPage({
               </p>
             </div>
             <div className="flex gap-3">
-              {isOwner && (
-                <button
-                  type="button"
-                  onClick={handleOpenInviteModal}
-                  className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
-                >
-                  <span className="flex items-center gap-2">
-                    <IconUserPlus size={16} />
-                    Invite user
-                  </span>
-                </button>
-              )}
+              <Link
+                to={`/projects/${projectId}/members`}
+                className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
+              >
+                <span className="flex items-center gap-2">
+                  <IconUsers size={16} />
+                  {isOwner ? "Manage Member" : "View Member"}
+                </span>
+              </Link>
               {!isViewer && (
                 <button
                   type="button"
@@ -407,20 +397,6 @@ export default function ProjectDetailPage({
           setVariableToDelete(null);
         }}
       />
-
-      {isInviteModalOpen && (
-        <InviteUserModal
-          isOpen={isInviteModalOpen}
-          availableRoles={getAvailableRoles(currentUserRole)}
-          onSubmit={async (values) => {
-            if (onInviteUser) {
-              await onInviteUser(values.email, values.role as Role);
-            }
-            setIsInviteModalOpen(false);
-          }}
-          onCancel={() => setIsInviteModalOpen(false)}
-        />
-      )}
     </>
   );
 }

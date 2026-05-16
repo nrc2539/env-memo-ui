@@ -5,6 +5,7 @@ import ProjectGuard from "@/components/guard/ProjectGuard";
 import AppLayout from "@/components/layout/AppLayout";
 import { ProjectListPage } from "./pages/ProjectListPage";
 import { ProjectDetailPage } from "./pages/ProjectDetailPage";
+import { ProjectMemberPage } from "./pages/ProjectMemberPage";
 
 export const projectRoutes: RouteObject[] = [
   {
@@ -23,6 +24,14 @@ export const projectRoutes: RouteObject[] = [
         element: (
           <ProjectGuard>
             <ProjectDetailPage />
+          </ProjectGuard>
+        ),
+      },
+      {
+        path: ":projectId/members",
+        element: (
+          <ProjectGuard>
+            <ProjectMemberPage />
           </ProjectGuard>
         ),
       },
