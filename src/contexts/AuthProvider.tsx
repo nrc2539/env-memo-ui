@@ -43,8 +43,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setIsAuthenticated(true);
   }, []);
 
-  console.log({ isAuthenticated });
-
   return (
     <AuthContext.Provider
       value={{
