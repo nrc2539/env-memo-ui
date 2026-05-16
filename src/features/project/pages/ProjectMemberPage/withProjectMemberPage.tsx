@@ -35,8 +35,11 @@ export default function withProjectMemberPage(
     } = useProjectMemberAction();
 
     const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
-    const [isDeleteMemberModalOpen, setIsDeleteMemberModalOpen] = useState(false);
-    const [selectedMember, setSelectedMember] = useState<ProjectMember | null>(null);
+    const [isDeleteMemberModalOpen, setIsDeleteMemberModalOpen] =
+      useState(false);
+    const [selectedMember, setSelectedMember] = useState<ProjectMember | null>(
+      null,
+    );
 
     const { data: projectDetail } = useQuery({
       queryKey: ["project", projectIdNum],
@@ -76,7 +79,7 @@ export default function withProjectMemberPage(
           description: "Invitation has been sent.",
         });
         queryClient.invalidateQueries({
-          queryKey: ["project", projectIdNum, "invitations"],
+          queryKey: ["project", projectIdNum],
         });
         setIsInviteModalOpen(false);
       },
