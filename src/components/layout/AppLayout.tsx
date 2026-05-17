@@ -8,6 +8,7 @@ import {
 } from "@tabler/icons-react";
 
 import { useAuth } from "@/hooks/useAuth";
+import { cn } from "@/libs/utils";
 
 const navItems = [
   { to: "/projects", label: "Projects", icon: IconFolder },
@@ -31,16 +32,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-10 bg-black/40 lg:hidden"
+          className="fixed inset-0 z-12 bg-black/40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-10 flex w-64 flex-col bg-teal-700 transition-transform lg:static lg:translate-x-0 ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={cn(
+          "fixed inset-y-0 left-0 z-12 flex w-64 flex-col bg-teal-700 transition-transform lg:static lg:translate-x-0 -translate-x-full",
+          { "translate-x-0": sidebarOpen },
+        )}
       >
         <div className="flex h-16 items-center gap-2 px-6">
           <Link to="/projects" className="text-xl font-bold text-white">

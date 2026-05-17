@@ -15,10 +15,12 @@ export function MemberTable({
       <table className="w-full">
         <thead>
           <tr className="border-b border-gray-100 bg-gray-50 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-            <th className="px-4 py-3">Name</th>
-            <th className="px-4 py-3">Email</th>
-            <th className="px-4 py-3">Role</th>
-            {isOwner && <th className="px-4 py-3 text-right">Actions</th>}
+            <th className="px-2 sm:px-3 py-3">Name</th>
+            <th className="px-2 sm:px-3 py-3">Email</th>
+            <th className="px-2 sm:px-3 py-3">Role</th>
+            {isOwner && (
+              <th className="w-14 px-2 sm:px-3 py-3 text-right">Actions</th>
+            )}
           </tr>
         </thead>
         <tbody>
@@ -29,15 +31,17 @@ export function MemberTable({
                 key={member.id}
                 className="border-b border-gray-100 text-sm last:border-0"
               >
-                <td className="px-4 py-3 font-medium text-gray-900">
+                <td className="max-w-24 sm:max-w-40 truncate px-2 sm:px-3 py-3 font-medium text-gray-900">
                   {member.user.name}
                 </td>
-                <td className="px-4 py-3 text-gray-500">{member.user.email}</td>
-                <td className="px-4 py-3">
+                <td className="max-w-26 sm:max-w-40 truncate px-2 sm:px-3 py-3 text-gray-500">
+                  {member.user.email}
+                </td>
+                <td className="max-w-16 sm:max-w-28 px-2 sm:px-3 py-3">
                   <Tag className="bg-teal-50 text-teal-700">{member.role}</Tag>
                 </td>
                 {isOwner && (
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-2 sm:px-3 py-3 text-right">
                     <button
                       type="button"
                       onClick={() => onRemove(member)}

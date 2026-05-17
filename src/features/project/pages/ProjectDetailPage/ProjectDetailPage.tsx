@@ -8,6 +8,7 @@ import {
   IconUsers,
 } from "@tabler/icons-react";
 
+import { cn } from "@/libs/utils";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { Accordion } from "@/components/Accordion";
 import { ConfirmModal } from "@/components/ConfirmModal";
@@ -133,7 +134,9 @@ export default function ProjectDetailPage({
       )}
       <div className="flex h-full gap-6 overflow-hidden">
         <div
-          className={`flex flex-1 flex-col overflow-hidden ${panelOpen ? "hidden lg:flex" : "flex"}`}
+          className={cn("flex flex-1 flex-col overflow-hidden", {
+            "hidden lg:flex": panelOpen,
+          })}
         >
           <div className="flex shrink-0 flex-wrap items-center justify-between gap-4 pb-4">
             <div>
@@ -250,7 +253,7 @@ export default function ProjectDetailPage({
           <button
             type="button"
             onClick={() => onSetPanelOpen(true)}
-            className="fixed bottom-6 right-6 z-20 flex items-center gap-2 rounded-full bg-teal-600 px-5 py-3 text-sm font-semibold text-white shadow-lg lg:hidden"
+            className="fixed bottom-6 right-6 z-10 flex items-center gap-2 rounded-full bg-teal-600 px-5 py-3 text-sm font-semibold text-white shadow-lg lg:hidden"
           >
             <IconEye size={20} />
             Preview ({selectedVars.length})
@@ -259,7 +262,7 @@ export default function ProjectDetailPage({
 
         {panelOpen && (
           <div
-            className="fixed inset-0 z-30 bg-black/40 lg:hidden"
+            className="fixed inset-0 z-11 bg-black/40 lg:hidden"
             onClick={() => onSetPanelOpen(false)}
           />
         )}

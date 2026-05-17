@@ -1,5 +1,6 @@
 import { IconCopy, IconX } from "@tabler/icons-react";
 
+import { cn } from "@/libs/utils";
 import type { VariablePreviewPanelProps } from "./interface";
 
 export function VariablePreviewPanel({
@@ -10,7 +11,13 @@ export function VariablePreviewPanel({
 }: VariablePreviewPanelProps) {
   return (
     <div
-      className={`fixed inset-y-0 right-0 z-40 w-full max-w-md transform bg-white shadow-xl transition-transform lg:static lg:translate-x-0 ${isOpen ? "translate-x-0" : "translate-x-full"} ${!isOpen && selectedVars.length === 0 ? "lg:hidden" : ""}`}
+      className={cn(
+        "fixed inset-y-0 right-0 z-12 w-full max-w-md transform bg-white shadow-xl transition-transform translate-x-full lg:static lg:translate-x-0",
+        {
+          "translate-x-0": isOpen,
+          "lg:hidden": !isOpen && selectedVars.length === 0,
+        },
+      )}
     >
       <div className="flex h-full flex-col">
         <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
