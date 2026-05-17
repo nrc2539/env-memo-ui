@@ -67,6 +67,8 @@ export default function ProjectDetailPage({
     }
   }
 
+  const hasSelectedVars = selectedVars.length > 0;
+
   const groupCount = groups.length;
   const totalVars = groups.reduce((s, g) => s + g.variables.length, 0);
 
@@ -87,8 +89,8 @@ export default function ProjectDetailPage({
       )}
       <div className="flex h-full gap-6 overflow-hidden">
         <div
-          className={cn("flex flex-1 flex-col overflow-hidden", {
-            "hidden lg:flex": panelOpen,
+          className={cn("flex flex-1 flex-col overflow-y-auto", {
+            "lg:flex": panelOpen,
           })}
         >
           {isLoading ? (
@@ -97,8 +99,12 @@ export default function ProjectDetailPage({
             </div>
           ) : (
             <>
-              <div className="flex shrink-0 flex-wrap items-end justify-between gap-4 pb-4">
-                <div className="max-w-1/2">
+              <div className="flex flex-col lg:flex-row shrink-0 flex-wrap items-end lg:justify-between gap-4 pb-4">
+                <div
+                  className={cn("max-w-full lg:max-w-1/2", {
+                    "lg:max-w-full": hasSelectedVars,
+                  })}
+                >
                   <Breadcrumb
                     items={[
                       { label: "Projects", href: "/projects" },
@@ -137,10 +143,14 @@ export default function ProjectDetailPage({
                     &nbsp;variables
                   </p>
                 </div>
-                <div className="flex gap-3">
+                <div
+                  className={cn("w-full md:w-auto flex gap-3", {
+                    "ml-auto": hasSelectedVars,
+                  })}
+                >
                   <Link
                     to={`/projects/${projectId}/members`}
-                    className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
+                    className="shrink-0 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
                   >
                     <span className="flex items-center gap-2">
                       <IconUsers size={16} />
@@ -151,7 +161,7 @@ export default function ProjectDetailPage({
                     <button
                       type="button"
                       onClick={() => handleOpenModal({ type: "createGroup" })}
-                      className="rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-500"
+                      className="w-full rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-500"
                     >
                       Create env group
                     </button>
@@ -159,7 +169,7 @@ export default function ProjectDetailPage({
                 </div>
               </div>
 
-              <div className="flex-1 overflow-y-auto">
+              <div className="flex-1">
                 <div className="space-y-3">
                   {groups.map((group) => {
                     const isOpen = expanded?.has(group.id) ?? false;
