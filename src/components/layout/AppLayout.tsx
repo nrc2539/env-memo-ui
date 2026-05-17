@@ -31,14 +31,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-30 bg-black/40 lg:hidden"
+          className="fixed inset-0 z-10 bg-black/40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-teal-700 transition-transform lg:static lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-10 flex w-64 flex-col bg-teal-700 transition-transform lg:static lg:translate-x-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -98,16 +98,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-teal-600 text-sm font-semibold text-white">
               {initials}
             </div>
-            <span className="text-sm font-medium text-gray-700">
-              {user?.name ?? "User"}
-            </span>
+            <div>
+              <p className="text-sm font-medium text-gray-700">
+                {user?.name ?? "User"}
+              </p>
+              <p className="text-xs font-medium text-gray-600">
+                {user?.email ?? "-"}
+              </p>
+            </div>
           </div>
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-auto sm:overflow-hidden p-4 md:p-6">
-          {children}
-        </main>
+        <main className="flex-1 overflow-auto p-4 md:p-6">{children}</main>
       </div>
     </div>
   );

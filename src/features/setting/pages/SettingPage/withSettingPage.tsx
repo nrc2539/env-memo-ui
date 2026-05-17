@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { FormikHelpers } from "formik";
 
 import { useAlert } from "@/hooks/useAlert";
@@ -11,7 +11,8 @@ export default function withSettingPage(Component: React.FC<SettingPageProps>) {
   function WithSettingPage() {
     const { user } = useAuth();
     const { success, error: showError } = useAlert();
-    const { changePassword } = useAuthAction();
+    const { changePassword, updateProfile } = useAuthAction();
+    const queryClient = useQueryClient();
 
     const changePasswordMutation = useMutation({
       mutationFn: ({
@@ -28,6 +29,28 @@ export default function withSettingPage(Component: React.FC<SettingPageProps>) {
       newPassword: "",
       confirmPassword: "",
     };
+
+    const updateProfileMutation = useMutation({
+      mutationFn: (name: string) => updateProfile(name),
+    });
+
+    async function handleSubmitProfileForm(name: string) {
+      await updateProfileMutation.mutateAsync(name, {
+        onSuccess: () => {
+          success({
+            message: "Profile updated",
+            description: "Your name has been updated successfully.",
+          });
+          queryClient.invalidateQueries({ queryKey: ["profile"] });
+        },
+        onError: () => {
+          showError({
+            message: "Update failed",
+            description: "Please try again.",
+          });
+        },
+      });
+    }
 
     async function handleSubmit(
       values: ChangePasswordFormType,
@@ -56,13 +79,14 @@ export default function withSettingPage(Component: React.FC<SettingPageProps>) {
       );
     }
 
-    return (
-      <Component
-        user={user ? { name: user.name, email: user.email } : null}
-        initialValues={initialValues}
-        onSubmit={handleSubmit}
-      />
-    );
+    const componentProps: SettingPageProps = {
+      user: user ? { name: user.name, email: user.email } : null,
+      onSubmitProfileForm: handleSubmitProfileForm,
+      initialValues: initialValues,
+      onSubmit: handleSubmit,
+    };
+
+    return <Component {...componentProps} />;
   }
 
   return WithSettingPage;

@@ -1,12 +1,13 @@
 import { Form, Formik } from "formik";
 import * as Yup from "yup";
 
+import { InputField } from "@/components/form/InputField";
 import PasswordInputField from "@/components/form/PasswordInputField";
 import { passwordRegx } from "@/libs/constant";
 
 import type { SettingPageProps } from "./interface";
 
-const validationSchema = Yup.object({
+const passwordValidationSchema = Yup.object({
   currentPassword: Yup.string().required("Current password is required"),
   newPassword: Yup.string()
     .matches(passwordRegx, "Min 10 characters, 1 letter, 1 special character")
@@ -16,8 +17,13 @@ const validationSchema = Yup.object({
     .required("Please confirm your password"),
 });
 
+const nameValidationSchema = Yup.object({
+  name: Yup.string().required("Name is required"),
+});
+
 export default function SettingPage({
   user,
+  onSubmitProfileForm,
   initialValues,
   onSubmit,
 }: SettingPageProps) {
@@ -28,16 +34,36 @@ export default function SettingPage({
       {user && (
         <div className="mb-6 rounded-xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
           <h2 className="text-lg font-semibold text-gray-900">Profile</h2>
-          <div className="mt-4 space-y-3">
-            <div>
-              <span className="text-sm font-medium text-gray-500">Name</span>
-              <p className="text-sm text-gray-900">{user.name}</p>
-            </div>
-            <div>
-              <span className="text-sm font-medium text-gray-500">Email</span>
-              <p className="text-sm text-gray-900">{user.email}</p>
-            </div>
-          </div>
+          <Formik
+            initialValues={{ name: user.name }}
+            validationSchema={nameValidationSchema}
+            onSubmit={(values) => onSubmitProfileForm(values.name)}
+          >
+            {({ isSubmitting }) => (
+              <Form className="mt-4">
+                <InputField
+                  name="name"
+                  label="Name"
+                  placeholder="Enter your name"
+                />
+                <div>
+                  <span className="text-sm font-medium text-gray-500">
+                    Email
+                  </span>
+                  <p className="text-sm text-gray-900">{user.email}</p>
+                </div>
+                <div className="flex justify-end pt-2">
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="rounded-lg bg-teal-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/40 disabled:opacity-50"
+                  >
+                    {isSubmitting ? "Saving..." : "Save"}
+                  </button>
+                </div>
+              </Form>
+            )}
+          </Formik>
         </div>
       )}
 
@@ -49,7 +75,7 @@ export default function SettingPage({
 
         <Formik
           initialValues={initialValues}
-          validationSchema={validationSchema}
+          validationSchema={passwordValidationSchema}
           onSubmit={onSubmit}
         >
           {({ isSubmitting }) => (
