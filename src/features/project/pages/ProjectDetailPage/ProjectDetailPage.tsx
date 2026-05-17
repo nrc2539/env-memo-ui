@@ -12,30 +12,35 @@ import { cn } from "@/libs/utils";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { Accordion } from "@/components/Accordion";
 import { ConfirmModal } from "@/components/ConfirmModal";
+import { Loading } from "@/components/Loading";
 import { ProjectMenu } from "@/features/project/components/ProjectMenu";
 import { ProjectModal } from "@/features/project/components/ProjectModal";
 import { EnvGroupModal } from "@/features/project/components/EnvGroupModal";
 import { EnvVariableModal } from "@/features/project/components/EnvVariableModal";
 import { EnvVariableTable } from "@/features/project/components/EnvVariableTable";
 import { VariablePreviewPanel } from "@/features/project/components/VariablePreviewPanel";
-
 import { Role } from "@/enums/roleEnum";
 import type { EnvVariableType } from "@/models/EnvVariableType";
-import type { EnvGroupType } from "@/models/EnvGroupType";
-import type { ProjectDetailPageProps } from "./interface";
+
+import type {
+  ProjectDetailModalStateType,
+  ProjectDetailPageProps,
+} from "./interface";
 
 export default function ProjectDetailPage({
   projectId,
   projectName,
+  projectDescription,
+  isLoading,
   groups = [],
   expanded,
   selected,
   panelOpen,
   toast,
   currentUserRole,
-  onToggleGroup,
-  onToggleVar,
-  onToggleGroupAll,
+  onExpandGroup,
+  onSelectVar,
+  onSelectVarAll,
   onCopyToClipboard,
   onSetPanelOpen,
   onEditProject,
@@ -47,27 +52,10 @@ export default function ProjectDetailPage({
   onEditVariable,
   onDeleteVariable,
 }: ProjectDetailPageProps) {
-  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
-  const [isDeleteProjectModalOpen, setIsDeleteProjectModalOpen] =
-    useState(false);
-
-  const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
-  const [isEditGroup, setIsEditGroup] = useState(false);
-  const [selectedGroup, setSelectedGroup] = useState<EnvGroupType | null>(null);
-  const [isDeleteGroupModalOpen, setIsDeleteGroupModalOpen] = useState(false);
-  const [groupToDelete, setGroupToDelete] = useState<EnvGroupType | null>(null);
-
-  const [isVariableModalOpen, setIsVariableModalOpen] = useState(false);
-  const [isEditVariable, setIsEditVariable] = useState(false);
-  const [selectedVariable, setSelectedVariable] =
-    useState<EnvVariableType | null>(null);
-  const [selectedVariableGroupId, setSelectedVariableGroupId] = useState<
-    string | null
-  >(null);
-  const [isDeleteVariableModalOpen, setIsDeleteVariableModalOpen] =
-    useState(false);
-  const [variableToDelete, setVariableToDelete] =
-    useState<EnvVariableType | null>(null);
+  const [modalState, setModalState] = useState<ProjectDetailModalStateType>({
+    type: undefined,
+    data: undefined,
+  });
 
   const isOwner = currentUserRole === Role.OWNER;
   const isViewer = currentUserRole === Role.VIEWER;
@@ -82,47 +70,12 @@ export default function ProjectDetailPage({
   const groupCount = groups.length;
   const totalVars = groups.reduce((s, g) => s + g.variables.length, 0);
 
-  function handleOpenEditProject() {
-    setIsProjectModalOpen(true);
+  function handleOpenModal(state: ProjectDetailModalStateType) {
+    setModalState(state);
   }
 
-  function handleOpenDeleteProject() {
-    setIsDeleteProjectModalOpen(true);
-  }
-
-  function handleOpenCreateGroup() {
-    setIsEditGroup(false);
-    setSelectedGroup(null);
-    setIsGroupModalOpen(true);
-  }
-
-  function handleOpenEditGroup(group: EnvGroupType) {
-    setIsEditGroup(true);
-    setSelectedGroup(group);
-    setIsGroupModalOpen(true);
-  }
-
-  function handleOpenDeleteGroup(group: EnvGroupType) {
-    setGroupToDelete(group);
-    setIsDeleteGroupModalOpen(true);
-  }
-
-  function handleOpenCreateVariable(groupId: string) {
-    setIsEditVariable(false);
-    setSelectedVariable(null);
-    setSelectedVariableGroupId(groupId);
-    setIsVariableModalOpen(true);
-  }
-
-  function handleOpenEditVariable(variable: EnvVariableType) {
-    setIsEditVariable(true);
-    setSelectedVariable(variable);
-    setIsVariableModalOpen(true);
-  }
-
-  function handleOpenDeleteVariable(variable: EnvVariableType) {
-    setVariableToDelete(variable);
-    setIsDeleteVariableModalOpen(true);
+  function handleCloseModal() {
+    setModalState({ type: undefined, data: undefined });
   }
 
   return (
@@ -138,115 +91,162 @@ export default function ProjectDetailPage({
             "hidden lg:flex": panelOpen,
           })}
         >
-          <div className="flex shrink-0 flex-wrap items-center justify-between gap-4 pb-4">
-            <div>
-              <Breadcrumb
-                items={[
-                  { label: "Projects", href: "/projects" },
-                  { label: projectName ?? "" },
-                ]}
-              />
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-semibold text-gray-900">
-                  {projectName}
-                </h1>
-                {isOwner && (
-                  <ProjectMenu
-                    project={{
-                      id: Number(projectId),
-                      name: projectName ?? "",
-                      description: null,
-                      createdAt: "",
-                      updatedAt: "",
-                    }}
-                    onEdit={handleOpenEditProject}
-                    onDelete={handleOpenDeleteProject}
+          {isLoading ? (
+            <div className="mt-5">
+              <Loading />
+            </div>
+          ) : (
+            <>
+              <div className="flex shrink-0 flex-wrap items-end justify-between gap-4 pb-4">
+                <div className="max-w-1/2">
+                  <Breadcrumb
+                    items={[
+                      { label: "Projects", href: "/projects" },
+                      { label: projectName ?? "" },
+                    ]}
                   />
-                )}
-              </div>
-              <p className="mt-1 text-sm text-gray-500">
-                {groupCount} environment groups &middot; {totalVars} variables
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <Link
-                to={`/projects/${projectId}/members`}
-                className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
-              >
-                <span className="flex items-center gap-2">
-                  <IconUsers size={16} />
-                  {isOwner ? "Manage Member" : "View Member"}
-                </span>
-              </Link>
-              {!isViewer && (
-                <button
-                  type="button"
-                  onClick={handleOpenCreateGroup}
-                  className="rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-500"
-                >
-                  Create env group
-                </button>
-              )}
-            </div>
-          </div>
-
-          <div className="flex-1 overflow-y-auto">
-            <div className="space-y-3">
-              {groups.map((group) => {
-                const isOpen = expanded?.has(group.id) ?? false;
-                return (
-                  <Accordion
-                    key={group.id}
-                    isOpen={isOpen}
-                    onToggle={() => onToggleGroup(group.id)}
-                    title={group.name}
-                    badge={group.variables.length}
-                    actions={
-                      !isViewer ? (
-                        <div className="flex items-center gap-1">
-                          <button
-                            type="button"
-                            onClick={() => handleOpenCreateVariable(group.id)}
-                            className="rounded-lg p-2 text-gray-400 transition hover:bg-gray-200 hover:text-gray-600"
-                            title="Add variable"
-                          >
-                            <IconPlus size={16} />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleOpenEditGroup(group)}
-                            className="rounded-lg p-2 text-gray-400 transition hover:bg-gray-200 hover:text-gray-600"
-                            title="Edit group"
-                          >
-                            <IconEdit size={16} />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => handleOpenDeleteGroup(group)}
-                            className="rounded-lg p-2 text-gray-400 transition hover:bg-gray-200 hover:text-gray-600"
-                            title="Delete group"
-                          >
-                            <IconTrash size={16} />
-                          </button>
-                        </div>
-                      ) : undefined
-                    }
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h1 className="text-2xl font-semibold text-gray-900">
+                        {projectName}
+                      </h1>
+                      {isOwner && (
+                        <ProjectMenu
+                          project={{
+                            id: Number(projectId),
+                            name: projectName ?? "",
+                            description: projectDescription ?? "",
+                            createdAt: "",
+                            updatedAt: "",
+                          }}
+                          onEdit={() =>
+                            handleOpenModal({ type: "editProject" })
+                          }
+                          onDelete={() =>
+                            handleOpenModal({ type: "deleteProject" })
+                          }
+                        />
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-600">
+                      {projectDescription}
+                    </p>
+                  </div>
+                  <p className="mt-2 text-sm text-gray-500">
+                    {groupCount} environment groups &middot; {totalVars}
+                    &nbsp;variables
+                  </p>
+                </div>
+                <div className="flex gap-3">
+                  <Link
+                    to={`/projects/${projectId}/members`}
+                    className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50"
                   >
-                    <EnvVariableTable
-                      variables={group.variables}
-                      selected={selected}
-                      onToggleAll={() => onToggleGroupAll(group)}
-                      onToggleVar={onToggleVar}
-                      onEdit={!isViewer ? handleOpenEditVariable : undefined}
-                      onDelete={
-                        !isViewer ? handleOpenDeleteVariable : undefined
-                      }
-                    />
-                  </Accordion>
-                );
-              })}
-            </div>
-          </div>
+                    <span className="flex items-center gap-2">
+                      <IconUsers size={16} />
+                      {isOwner ? "Manage Member" : "View Member"}
+                    </span>
+                  </Link>
+                  {!isViewer && (
+                    <button
+                      type="button"
+                      onClick={() => handleOpenModal({ type: "createGroup" })}
+                      className="rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-500"
+                    >
+                      Create env group
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex-1 overflow-y-auto">
+                <div className="space-y-3">
+                  {groups.map((group) => {
+                    const isOpen = expanded?.has(group.id) ?? false;
+                    return (
+                      <Accordion
+                        key={group.id}
+                        isOpen={isOpen}
+                        onExpand={() => onExpandGroup(group.id)}
+                        title={group.name}
+                        badge={group.variables.length}
+                        actions={
+                          !isViewer ? (
+                            <div className="flex items-center gap-1">
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleOpenModal({
+                                    type: "createVariable",
+                                    data: { group },
+                                  })
+                                }
+                                className="rounded-lg p-2 text-gray-400 transition hover:bg-gray-200 hover:text-gray-600"
+                                title="Add variable"
+                              >
+                                <IconPlus size={16} />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleOpenModal({
+                                    type: "editGroup",
+                                    data: { group },
+                                  })
+                                }
+                                className="rounded-lg p-2 text-gray-400 transition hover:bg-gray-200 hover:text-gray-600"
+                                title="Edit group"
+                              >
+                                <IconEdit size={16} />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleOpenModal({
+                                    type: "deleteGroup",
+                                    data: { group },
+                                  })
+                                }
+                                className="rounded-lg p-2 text-gray-400 transition hover:bg-gray-200 hover:text-gray-600"
+                                title="Delete group"
+                              >
+                                <IconTrash size={16} />
+                              </button>
+                            </div>
+                          ) : undefined
+                        }
+                      >
+                        <EnvVariableTable
+                          variables={group.variables}
+                          selected={selected}
+                          onToggleAll={() => onSelectVarAll(group)}
+                          onToggleVar={onSelectVar}
+                          onEdit={
+                            !isViewer
+                              ? (variable) =>
+                                  handleOpenModal({
+                                    type: "editVariable",
+                                    data: { variable },
+                                  })
+                              : undefined
+                          }
+                          onDelete={
+                            !isViewer
+                              ? (variable) =>
+                                  handleOpenModal({
+                                    type: "deleteVariable",
+                                    data: { variable },
+                                  })
+                              : undefined
+                          }
+                        />
+                      </Accordion>
+                    );
+                  })}
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         {selectedVars.length > 0 && (
@@ -276,122 +276,123 @@ export default function ProjectDetailPage({
       </div>
 
       <ProjectModal
-        isOpen={isProjectModalOpen}
+        isOpen={modalState.type === "editProject"}
         isEdit={true}
         initialValues={{
           name: projectName ?? "",
-          description: "",
+          description: projectDescription ?? "",
         }}
         onSubmit={async (values) => {
           if (onEditProject) {
             await onEditProject(values.name, values.description);
           }
-          setIsProjectModalOpen(false);
+          handleCloseModal();
         }}
-        onCancel={() => setIsProjectModalOpen(false)}
+        onCancel={handleCloseModal}
       />
 
       <ConfirmModal
-        isOpen={isDeleteProjectModalOpen}
+        isOpen={modalState.type === "deleteProject"}
         title="Delete Project"
         message={`Are you sure you want to delete "${projectName}"? This action cannot be undone.`}
         confirmText="Delete"
         cancelText="Cancel"
         onConfirm={async () => {
           if (onDeleteProject) await onDeleteProject();
-          setIsDeleteProjectModalOpen(false);
+          handleCloseModal();
         }}
-        onCancel={() => setIsDeleteProjectModalOpen(false)}
+        onCancel={handleCloseModal}
       />
 
-      {isGroupModalOpen && (
+      {(modalState.type === "editGroup" ||
+        modalState.type === "createGroup") && (
         <EnvGroupModal
-          isOpen={isGroupModalOpen}
-          isEdit={isEditGroup}
+          isOpen
+          isEdit={modalState.type === "editGroup"}
           initialValues={
-            selectedGroup ? { name: selectedGroup.name } : undefined
+            modalState.data?.group?.id
+              ? { name: modalState.data?.group.name }
+              : undefined
           }
           onSubmit={async (values) => {
-            if (isEditGroup && selectedGroup && onEditGroup) {
-              await onEditGroup(selectedGroup.id, values.name);
+            if (
+              modalState.type === "editGroup" &&
+              !!modalState.data?.group?.id &&
+              onEditGroup
+            ) {
+              await onEditGroup(modalState.data.group.id, values.name);
             } else if (onCreateGroup) {
               await onCreateGroup(values.name);
             }
-            setIsGroupModalOpen(false);
-            setSelectedGroup(null);
+            handleCloseModal();
           }}
-          onCancel={() => {
-            setIsGroupModalOpen(false);
-            setSelectedGroup(null);
-          }}
+          onCancel={handleCloseModal}
         />
       )}
 
       <ConfirmModal
-        isOpen={isDeleteGroupModalOpen}
+        isOpen={modalState.type === "deleteGroup" && !!modalState.data?.group}
         title="Delete Environment Group"
-        message={`Are you sure you want to delete "${groupToDelete?.name}"? This action cannot be undone.`}
+        message={`Are you sure you want to delete "${modalState.data?.group?.name}"? This action cannot be undone.`}
         confirmText="Delete"
         cancelText="Cancel"
         onConfirm={async () => {
-          if (groupToDelete && onDeleteGroup)
-            await onDeleteGroup(groupToDelete.id);
-          setIsDeleteGroupModalOpen(false);
-          setGroupToDelete(null);
+          if (modalState.data?.group?.id && onDeleteGroup)
+            await onDeleteGroup(modalState.data.group.id);
+          handleCloseModal();
         }}
-        onCancel={() => {
-          setIsDeleteGroupModalOpen(false);
-          setGroupToDelete(null);
-        }}
+        onCancel={handleCloseModal}
       />
 
-      {isVariableModalOpen && (
+      {(modalState.type === "createVariable" ||
+        modalState.type === "editVariable") && (
         <EnvVariableModal
-          isOpen={isVariableModalOpen}
-          isEdit={isEditVariable}
+          isOpen
+          isEdit={modalState.type === "editVariable"}
           initialValues={
-            selectedVariable
-              ? { key: selectedVariable.key, value: selectedVariable.value }
+            modalState.data?.variable
+              ? {
+                  key: modalState.data.variable.key,
+                  value: modalState.data.variable.value,
+                }
               : undefined
           }
           onSubmit={async (values) => {
-            if (isEditVariable && selectedVariable && onEditVariable) {
-              await onEditVariable(selectedVariable, values.key, values.value);
-            } else if (selectedVariableGroupId && onCreateVariable) {
+            if (
+              modalState.type === "editVariable" &&
+              modalState.data?.variable &&
+              onEditVariable
+            ) {
+              await onEditVariable(
+                modalState.data.variable,
+                values.key,
+                values.value,
+              );
+            } else if (modalState.data?.group?.id && onCreateVariable) {
               await onCreateVariable(
-                selectedVariableGroupId,
+                modalState.data.group.id,
                 values.key,
                 values.value,
               );
             }
-            setIsVariableModalOpen(false);
-            setSelectedVariable(null);
-            setSelectedVariableGroupId(null);
+            handleCloseModal();
           }}
-          onCancel={() => {
-            setIsVariableModalOpen(false);
-            setSelectedVariable(null);
-            setSelectedVariableGroupId(null);
-          }}
+          onCancel={handleCloseModal}
         />
       )}
 
       <ConfirmModal
-        isOpen={isDeleteVariableModalOpen}
+        isOpen={modalState.type === "deleteVariable"}
         title="Delete Variable"
-        message={`Are you sure you want to delete "${variableToDelete?.key}"? This action cannot be undone.`}
+        message={`Are you sure you want to delete "${modalState.data?.variable?.key}"? This action cannot be undone.`}
         confirmText="Delete"
         cancelText="Cancel"
         onConfirm={async () => {
-          if (variableToDelete && onDeleteVariable)
-            await onDeleteVariable(variableToDelete);
-          setIsDeleteVariableModalOpen(false);
-          setVariableToDelete(null);
+          if (modalState.data?.variable && onDeleteVariable)
+            await onDeleteVariable(modalState.data.variable);
+          handleCloseModal();
         }}
-        onCancel={() => {
-          setIsDeleteVariableModalOpen(false);
-          setVariableToDelete(null);
-        }}
+        onCancel={handleCloseModal}
       />
     </>
   );

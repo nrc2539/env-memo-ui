@@ -41,13 +41,13 @@ export default function withProjectDetailPage(
 
     const groupsQueryKey = ["project", projectIdNum, "groups"];
 
-    const { data: projectDetail } = useQuery({
+    const { data: projectDetail, isPending: isProjectLoading } = useQuery({
       queryKey: ["project", projectIdNum],
       queryFn: () => getProjectDetail(projectIdNum),
       enabled: !!projectIdNum,
     });
 
-    const { data: groups = [] } = useQuery({
+    const { data: groups = [], isPending: isGroupsLoading } = useQuery({
       queryKey: groupsQueryKey,
       queryFn: () => getEnvGroups(projectIdNum),
       enabled: !!projectIdNum,
@@ -65,7 +65,7 @@ export default function withProjectDetailPage(
       return () => clearTimeout(id);
     }, [toast]);
 
-    const toggleGroup = (id: string) => {
+    const onExpandGroup = (id: string) => {
       setExpanded((prev) => {
         const next = new Set(prev);
         if (next.has(id)) next.delete(id);
@@ -74,7 +74,7 @@ export default function withProjectDetailPage(
       });
     };
 
-    const toggleVar = (id: string) => {
+    const onSelectVar = (id: string) => {
       setSelected((prev) => {
         const next = new Set(prev);
         if (next.has(id)) next.delete(id);
@@ -83,7 +83,7 @@ export default function withProjectDetailPage(
       });
     };
 
-    const toggleGroupAll = (group: EnvGroupType) => {
+    const onSelectVarAll = (group: EnvGroupType) => {
       const ids = group.variables.map((v) => v.id);
       const allSelected = ids.every((id) => selected.has(id));
       setSelected((prev) => {
@@ -329,18 +329,22 @@ export default function withProjectDetailPage(
       [deleteVariableMutation],
     );
 
+    const isLoading = isProjectLoading || isGroupsLoading;
+
     const componentProps: ProjectDetailPageProps = {
       projectId,
+      isLoading,
       projectName: projectDetail?.name ?? "Loading...",
+      projectDescription: projectDetail?.description ?? "",
       groups,
       expanded,
       selected,
       panelOpen,
       toast,
       currentUserRole,
-      onToggleGroup: toggleGroup,
-      onToggleVar: toggleVar,
-      onToggleGroupAll: toggleGroupAll,
+      onExpandGroup,
+      onSelectVar,
+      onSelectVarAll,
       onCopyToClipboard: copyToClipboard,
       onSetPanelOpen: setPanelOpen,
       onEditProject,
