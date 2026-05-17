@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 export interface AccordionProps {
   isOpen: boolean;
-  onToggle: () => void;
+  onExpand: () => void;
   title: string;
   badge?: string | number;
   actions?: ReactNode;

@@ -51,7 +51,8 @@ export default function ProjectGuard({ children }: ProjectGuardProps) {
     }
   }, [projectIdNum, error, data, user, info, showError, navigate]);
 
-  if (isLoading || !data) return <Loading className="mt-5" />;
+  if (isLoading || !data)
+    return <Loading className="mt-5" text="Check permission.." />;
 
   const isMember = data.members?.some((m) => m.userId === user?.id);
   if (!projectIdNum || error || !isMember) return null;
