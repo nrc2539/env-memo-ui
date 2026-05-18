@@ -7,6 +7,14 @@ export type ProjectMemberSearchParams = {
   page: number;
 };
 
+export type ProjectMemberModalStateType = {
+  type?: "inviteUser" | "deleteMember" | "deleteInvitation";
+  data?: {
+    member?: ProjectMemberType;
+    invitation?: InvitationType;
+  };
+};
+
 export interface ProjectMemberPageViewProps {
   projectId: string;
   projectName: string;
@@ -18,14 +26,10 @@ export interface ProjectMemberPageViewProps {
   isLoading: boolean;
   page: number;
   totalPages: number;
-  isInviteModalOpen: boolean;
-  isDeleteMemberModalOpen: boolean;
-  selectedMember: ProjectMemberType | null;
-  onOpenInviteModal: () => void;
-  onCloseInviteModal: () => void;
+  resendingIds: Set<string>;
   onInviteSubmit: (values: { email: string; role: string }) => Promise<void>;
-  onRemoveMember: (member: ProjectMemberType) => void;
-  onConfirmRemoveMember: () => void;
-  onCancelRemoveMember: () => void;
+  onRemoveMember: (member: ProjectMemberType) => Promise<void>;
+  onResendInvite: (invitationId: string) => Promise<void>;
+  onRemoveInvitation: (invitationId: string) => Promise<void>;
   onPageChange: (page: number) => void;
 }

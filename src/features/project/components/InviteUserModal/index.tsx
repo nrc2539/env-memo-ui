@@ -1,14 +1,12 @@
 import { Form, Formik } from "formik";
 import * as Yup from "yup";
-import { IconShield, IconUserPlus } from "@tabler/icons-react";
+import { IconUserPlus } from "@tabler/icons-react";
 
 import { Modal } from "@/components/Modal";
 import { InputField } from "@/components/form/InputField";
 import { DropdownField } from "@/components/form/DropdownField";
-
 import type { Role } from "@/enums/roleEnum";
 import type { SelectType } from "@/interfaces/SelectType";
-
 import type { InviteUserFormType } from "@/models/InviteUserFormType";
 import type { InviteUserModalProps } from "./interface";
 
@@ -23,7 +21,6 @@ function roleOptions(availableRoles: Role[]): SelectType[] {
   return availableRoles.map((r) => ({
     label: r.charAt(0) + r.slice(1).toLowerCase(),
     value: r,
-    icon: <IconShield size={16} />,
   }));
 }
 

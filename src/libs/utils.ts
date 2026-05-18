@@ -1,3 +1,4 @@
+import type { AxiosError } from "axios";
 import { type ClassValue, clsx } from "clsx";
 import { DateTime } from "luxon";
 import { twMerge } from "tailwind-merge";
@@ -32,4 +33,9 @@ export function formatDate(
   if (!date) return "-";
   const newDate = DateTime.fromISO(new Date(date).toISOString());
   return newDate.toFormat(format);
+}
+
+export function getErrorMessage(e: AxiosError): string {
+  const data = e.response?.data as { message?: string } | undefined;
+  return data?.message || "Something wrong.";
 }

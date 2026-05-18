@@ -38,7 +38,9 @@ export function MemberTable({
                   {member.user.email}
                 </td>
                 <td className="max-w-16 sm:max-w-28 px-2 sm:px-3 py-3">
-                  <Tag className="bg-teal-50 text-teal-700">{member.role}</Tag>
+                  <Tag className="bg-teal-50 text-teal-700 text-[10px] md:text-xs">
+                    {member.role}
+                  </Tag>
                 </td>
                 {isOwner && (
                   <td className="px-2 sm:px-3 py-3 text-center">

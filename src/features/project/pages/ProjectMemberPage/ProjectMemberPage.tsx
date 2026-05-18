@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { IconUserPlus } from "@tabler/icons-react";
 
 import { Breadcrumb } from "@/components/Breadcrumb";
@@ -9,7 +10,12 @@ import { MemberTable } from "./components/MemberTable";
 import { InvitationTable } from "./components/InvitationTable";
 import { getAvailableRoles } from "@/enums/roleEnum";
 
-import type { ProjectMemberPageViewProps } from "./interface";
+import type { InvitationType } from "@/models/InvitationType";
+
+import type {
+  ProjectMemberPageViewProps,
+  ProjectMemberModalStateType,
+} from "./interface";
 
 export default function ProjectMemberPage({
   projectId,
@@ -22,17 +28,34 @@ export default function ProjectMemberPage({
   isLoading,
   page,
   totalPages,
-  isInviteModalOpen,
-  isDeleteMemberModalOpen,
-  selectedMember,
-  onOpenInviteModal,
-  onCloseInviteModal,
+  resendingIds,
   onInviteSubmit,
   onRemoveMember,
-  onConfirmRemoveMember,
-  onCancelRemoveMember,
+  onResendInvite,
+  onRemoveInvitation,
   onPageChange,
 }: ProjectMemberPageViewProps) {
+  const [modalState, setModalState] = useState<ProjectMemberModalStateType>({
+    type: undefined,
+    data: undefined,
+  });
+
+  function handleOpenModal(state: ProjectMemberModalStateType) {
+    setModalState(state);
+  }
+
+  function handleCloseModal() {
+    setModalState({ type: undefined, data: undefined });
+  }
+
+  async function handleResendInvite(inv: InvitationType) {
+    await onResendInvite(inv.id);
+  }
+
+  function handleRemoveInvitation(inv: InvitationType) {
+    handleOpenModal({ type: "deleteInvitation", data: { invitation: inv } });
+  }
+
   if (isLoading) return <Loading size="lg" className="mt-10" />;
 
   return (
@@ -50,7 +73,7 @@ export default function ProjectMemberPage({
         {isOwner && (
           <button
             type="button"
-            onClick={onOpenInviteModal}
+            onClick={() => handleOpenModal({ type: "inviteUser" })}
             className="flex items-center gap-2 rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-teal-500"
           >
             <IconUserPlus size={16} />
@@ -63,7 +86,9 @@ export default function ProjectMemberPage({
         members={members}
         currentUserId={currentUserId}
         isOwner={isOwner}
-        onRemove={onRemoveMember}
+        onRemove={(member) =>
+          handleOpenModal({ type: "deleteMember", data: { member } })
+        }
       />
 
       <Pagination
@@ -78,27 +103,55 @@ export default function ProjectMemberPage({
           <h2 className="mb-3 text-lg font-semibold text-gray-900">
             Pending Invitations
           </h2>
-          <InvitationTable invitations={invitations} />
+          <InvitationTable
+            invitations={invitations}
+            onResend={handleResendInvite}
+            resendingIds={resendingIds}
+            onRemove={handleRemoveInvitation}
+          />
         </div>
       )}
 
-      {isInviteModalOpen && (
+      {modalState.type === "inviteUser" && (
         <InviteUserModal
-          isOpen={isInviteModalOpen}
+          isOpen
           availableRoles={getAvailableRoles(currentUserRole)}
-          onSubmit={onInviteSubmit}
-          onCancel={onCloseInviteModal}
+          onSubmit={async (values) => {
+            await onInviteSubmit(values);
+            handleCloseModal();
+          }}
+          onCancel={handleCloseModal}
         />
       )}
 
       <ConfirmModal
-        isOpen={isDeleteMemberModalOpen}
+        isOpen={modalState.type === "deleteMember"}
         title="Remove Member"
-        message={`Are you sure you want to remove "${selectedMember?.user.name}" from this project?`}
+        message={`Are you sure you want to remove "${modalState.data?.member?.user.name}" from this project?`}
         confirmText="Remove"
         cancelText="Cancel"
-        onConfirm={onConfirmRemoveMember}
-        onCancel={onCancelRemoveMember}
+        onConfirm={async () => {
+          if (modalState.data?.member) {
+            await onRemoveMember(modalState.data.member);
+          }
+          handleCloseModal();
+        }}
+        onCancel={handleCloseModal}
+      />
+
+      <ConfirmModal
+        isOpen={modalState.type === "deleteInvitation"}
+        title="Remove Invitation"
+        message={`Are you sure you want to remove the invitation for "${modalState.data?.invitation?.email}"?`}
+        confirmText="Remove"
+        cancelText="Cancel"
+        onConfirm={async () => {
+          if (modalState.data?.invitation?.id) {
+            await onRemoveInvitation(modalState.data.invitation.id);
+          }
+          handleCloseModal();
+        }}
+        onCancel={handleCloseModal}
       />
     </div>
   );

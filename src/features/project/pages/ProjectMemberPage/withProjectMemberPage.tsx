@@ -36,6 +36,8 @@ export default function withProjectMemberPage(
       getProjectInvitations,
       inviteUserToProject,
       removeProjectMember,
+      resendInvitation,
+      removeInvitation,
     } = useProjectMemberAction();
 
     const { getNumberParam } = useGetQuery();
@@ -45,12 +47,7 @@ export default function withProjectMemberPage(
       page: getNumberParam("page") ?? 1,
     };
 
-    const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
-    const [isDeleteMemberModalOpen, setIsDeleteMemberModalOpen] =
-      useState(false);
-    const [selectedMember, setSelectedMember] = useState<ProjectMemberType | null>(
-      null,
-    );
+    const [resendingIds, setResendingIds] = useState<Set<string>>(new Set());
 
     const { data: projectDetail } = useQuery({
       queryKey: ["project", projectIdNum],
@@ -66,13 +63,18 @@ export default function withProjectMemberPage(
 
     const { data: membersData, isLoading: isLoadingMembers } = useQuery({
       queryKey: ["project", projectIdNum, "members", searchParams.page],
-      queryFn: () => getProjectMembers(projectIdNum, { page: searchParams.page }),
+      queryFn: () =>
+        getProjectMembers(projectIdNum, { page: searchParams.page }),
       enabled: !!projectIdNum,
     });
 
     const { data: invitationsData } = useQuery({
       queryKey: ["project", projectIdNum, "invitations"],
-      queryFn: () => getProjectInvitations(projectIdNum, { status: InvitationStatus.PENDING, all: true }),
+      queryFn: () =>
+        getProjectInvitations(projectIdNum, {
+          status: InvitationStatus.PENDING,
+          all: true,
+        }),
       enabled: !!projectIdNum && isOwner,
     });
 
@@ -93,7 +95,6 @@ export default function withProjectMemberPage(
         queryClient.invalidateQueries({
           queryKey: ["project", projectIdNum],
         });
-        setIsInviteModalOpen(false);
       },
       onError: () => {
         alert.error({
@@ -116,8 +117,6 @@ export default function withProjectMemberPage(
         queryClient.invalidateQueries({
           queryKey: ["project", projectIdNum, "members"],
         });
-        setIsDeleteMemberModalOpen(false);
-        setSelectedMember(null);
       },
       onError: () => {
         alert.error({
@@ -127,38 +126,80 @@ export default function withProjectMemberPage(
       },
     });
 
-    const handleOpenInviteModal = useCallback(() => {
-      setIsInviteModalOpen(true);
-    }, []);
+    const resendInviteMutation = useMutation({
+      mutationFn: (invitationId: string) =>
+        resendInvitation(projectIdNum, invitationId),
+      onSuccess: () => {
+        alert.success({
+          message: "Invitation resent",
+          description: "The invitation has been resent.",
+        });
+      },
+      onError: () => {
+        alert.error({
+          message: "Resend failed",
+          description: "Please try again.",
+        });
+      },
+      onSettled: (_data, _error, invitationId) => {
+        setResendingIds((prev) => {
+          const next = new Set(prev);
+          next.delete(invitationId);
+          return next;
+        });
+      },
+    });
 
-    const handleCloseInviteModal = useCallback(() => {
-      setIsInviteModalOpen(false);
-    }, []);
+    const removeInvitationMutation = useMutation({
+      mutationFn: (invitationId: string) =>
+        removeInvitation(projectIdNum, invitationId),
+      onSuccess: () => {
+        alert.info({
+          message: "Invitation removed",
+          description: "The invitation has been removed.",
+        });
+        queryClient.invalidateQueries({
+          queryKey: ["project", projectIdNum, "invitations"],
+        });
+      },
+      onError: () => {
+        alert.error({
+          message: "Remove failed",
+          description: "Please try again.",
+        });
+      },
+    });
 
-    const handleInviteSubmit = useCallback(
+    const onInviteSubmit = useCallback(
       async (values: { email: string; role: string }) => {
         await inviteMutation.mutateAsync(values);
       },
       [inviteMutation],
     );
 
-    const handleRemoveMember = useCallback((member: ProjectMemberType) => {
-      setSelectedMember(member);
-      setIsDeleteMemberModalOpen(true);
-    }, []);
+    const onRemoveMember = useCallback(
+      async (member: ProjectMemberType) => {
+        await removeMemberMutation.mutateAsync(member.userId);
+      },
+      [removeMemberMutation],
+    );
 
-    const handleConfirmRemoveMember = useCallback(() => {
-      if (selectedMember) {
-        removeMemberMutation.mutateAsync(selectedMember.userId);
-      }
-    }, [selectedMember, removeMemberMutation]);
+    const onResendInvite = useCallback(
+      async (invitationId: string) => {
+        setResendingIds((prev) => new Set(prev).add(invitationId));
+        await resendInviteMutation.mutateAsync(invitationId);
+      },
+      [resendInviteMutation],
+    );
 
-    const handleCancelRemoveMember = useCallback(() => {
-      setIsDeleteMemberModalOpen(false);
-      setSelectedMember(null);
-    }, []);
+    const onRemoveInvitation = useCallback(
+      async (invitationId: string) => {
+        await removeInvitationMutation.mutateAsync(invitationId);
+      },
+      [removeInvitationMutation],
+    );
 
-    function handlePageChange(newPage: number) {
+    function onPageChange(newPage: number) {
       updateQueryStrings({ page: newPage });
     }
 
@@ -173,16 +214,12 @@ export default function withProjectMemberPage(
       isLoading,
       page: searchParams.page,
       totalPages,
-      isInviteModalOpen,
-      isDeleteMemberModalOpen,
-      selectedMember,
-      onOpenInviteModal: handleOpenInviteModal,
-      onCloseInviteModal: handleCloseInviteModal,
-      onInviteSubmit: handleInviteSubmit,
-      onRemoveMember: handleRemoveMember,
-      onConfirmRemoveMember: handleConfirmRemoveMember,
-      onCancelRemoveMember: handleCancelRemoveMember,
-      onPageChange: handlePageChange,
+      resendingIds,
+      onInviteSubmit,
+      onRemoveMember,
+      onResendInvite,
+      onRemoveInvitation,
+      onPageChange,
     };
 
     return <Component {...viewProps} />;

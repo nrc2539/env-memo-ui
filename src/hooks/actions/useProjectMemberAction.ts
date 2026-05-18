@@ -51,10 +51,26 @@ export function useProjectMemberAction() {
     );
   }
 
+  async function resendInvitation(
+    projectId: number,
+    invitationId: string,
+  ): Promise<void> {
+    await apiClient.post(`/projects/${projectId}/invitations/${invitationId}/resend`);
+  }
+
+  async function removeInvitation(
+    projectId: number,
+    invitationId: string,
+  ): Promise<void> {
+    await apiClient.delete(`/projects/${projectId}/invitations/${invitationId}`);
+  }
+
   return {
     inviteUserToProject,
     getProjectMembers,
     getProjectInvitations,
     removeProjectMember,
+    resendInvitation,
+    removeInvitation,
   };
 }
