@@ -19,7 +19,7 @@ export function MemberTable({
             <th className="px-2 sm:px-3 py-3">Email</th>
             <th className="px-2 sm:px-3 py-3">Role</th>
             {isOwner && (
-              <th className="w-14 px-2 sm:px-3 py-3 text-right">Actions</th>
+              <th className="w-14 px-2 sm:px-3 py-3 text-center">Actions</th>
             )}
           </tr>
         </thead>
@@ -41,7 +41,7 @@ export function MemberTable({
                   <Tag className="bg-teal-50 text-teal-700">{member.role}</Tag>
                 </td>
                 {isOwner && (
-                  <td className="px-2 sm:px-3 py-3 text-right">
+                  <td className="px-2 sm:px-3 py-3 text-center">
                     <button
                       type="button"
                       onClick={() => onRemove(member)}
