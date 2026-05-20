@@ -12,6 +12,7 @@ import { cn } from "@/libs/utils";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { Accordion } from "@/components/Accordion";
 import { ConfirmModal } from "@/components/ConfirmModal";
+import { EmptyState } from "@/components/EmptyState";
 import { Loading } from "@/components/Loading";
 import { ProjectMenu } from "@/features/project/components/ProjectMenu";
 import { ProjectModal } from "@/features/project/components/ProjectModal";
@@ -171,7 +172,10 @@ export default function ProjectDetailPage({
 
               <div className="flex-1">
                 <div className="space-y-3">
-                  {groups.map((group) => {
+                  {groups.length === 0 ? (
+                    <EmptyState text="No environment groups yet" />
+                  ) : (
+                    groups.map((group) => {
                     const isOpen = expanded?.has(group.id) ?? false;
                     return (
                       <Accordion
@@ -252,7 +256,8 @@ export default function ProjectDetailPage({
                         />
                       </Accordion>
                     );
-                  })}
+                  })
+                  )}
                 </div>
               </div>
             </>

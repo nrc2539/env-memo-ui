@@ -1,5 +1,6 @@
 import { IconSearch } from "@tabler/icons-react";
 
+import { EmptyState } from "@/components/EmptyState";
 import { Loading } from "@/components/Loading";
 import { ConfirmModal } from "@/components/ConfirmModal";
 import Input from "@/components/Input";
@@ -47,12 +48,15 @@ export default function ProjectListPage({
           value={search}
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Search projects..."
-          leftIcon={<IconSearch size={18} className="text-gray-400" />}
+          leftIcon={<IconSearch size={18} className="mr-2 text-gray-400" />}
+          showError={false}
         />
       </div>
 
       {isLoading ? (
         <Loading className="mt-5" />
+      ) : displayProjects.length === 0 ? (
+        <EmptyState text="No projects found" />
       ) : (
         <>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -82,9 +86,9 @@ export default function ProjectListPage({
           initialValues={
             selectedProject
               ? {
-                  name: selectedProject.name,
-                  description: selectedProject.description ?? "",
-                }
+                name: selectedProject.name,
+                description: selectedProject.description ?? "",
+              }
               : undefined
           }
           onSubmit={onSubmit}
