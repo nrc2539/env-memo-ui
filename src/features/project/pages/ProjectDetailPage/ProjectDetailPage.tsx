@@ -99,7 +99,7 @@ export default function ProjectDetailPage({
             </div>
           ) : (
             <>
-              <div className="flex flex-col lg:flex-row shrink-0 flex-wrap items-end lg:justify-between gap-4 pb-4">
+              <div className="flex flex-col lg:flex-row shrink-0 flex-wrap items-start lg:items-end lg:justify-between gap-4 pb-4">
                 <div
                   className={cn("max-w-full lg:max-w-1/2", {
                     "lg:max-w-full": hasSelectedVars,
