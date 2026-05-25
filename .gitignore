@@ -24,3 +24,10 @@ dist-ssr
 *.sw?
 
 .env
+package-lock.json
+coverage/
+
+# Playwright
+e2e/.auth/
+playwright-report/
+test-results/

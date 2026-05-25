@@ -42,6 +42,19 @@ See `.agents/skills/<skill>/SKILL.md` for detailed usage.
 - Base URL: `VITE_API_URL` from `.env` (default `http://localhost:8080/api`)
 - Accessed via `import.meta.env.VITE_API_URL` in `src/libs/constant.ts`
 
-## No tests
+## Testing
 
-No test framework or test files exist. Build verification is `npm run build`.
+```sh
+npm test              # vitest (watch mode)
+npm run test:run      # vitest (one-shot)
+npm run test:coverage # vitest with coverage
+npm run test:e2e      # playwright
+```
+
+- **Unit / Integration:** Vitest + Testing Library + MSW (network-level mocking)
+- **E2E:** Playwright
+- **Infra:** `src/test/setup.ts` — jest-dom matchers + MSW server lifecycle
+- **Custom render:** `src/test/test-utils.tsx` — wraps components with `QueryClientProvider` + `MemoryRouter` + `AuthContext`
+- **MSW handlers:** `src/test/mocks/handlers.ts` — covers all API endpoints
+- Test files colocate with source: `src/**/*.{test,spec}.{ts,tsx}`
+- Build verification: `npm run build` (tsc -b && vite build)
