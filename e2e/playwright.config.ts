@@ -25,7 +25,7 @@ export default defineConfig({
     },
     {
       name: "chromium",
-      testMatch: /(projects|env-variables)\.spec\.ts/,
+      testMatch: /(projects|env-variables|project-members)\.spec\.ts/,
       use: {
         ...devices["Desktop Chrome"],
         headless: true,

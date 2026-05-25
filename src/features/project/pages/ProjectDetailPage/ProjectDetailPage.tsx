@@ -197,6 +197,7 @@ export default function ProjectDetailPage({
                                 }
                                 className="rounded-lg p-2 text-gray-400 transition hover:bg-gray-200 hover:text-gray-600"
                                 title="Add variable"
+                                aria-label="Add variable"
                               >
                                 <IconPlus size={16} />
                               </button>
@@ -210,6 +211,7 @@ export default function ProjectDetailPage({
                                 }
                                 className="rounded-lg p-2 text-gray-400 transition hover:bg-gray-200 hover:text-gray-600"
                                 title="Edit group"
+                                aria-label="Edit group"
                               >
                                 <IconEdit size={16} />
                               </button>
@@ -223,6 +225,7 @@ export default function ProjectDetailPage({
                                 }
                                 className="rounded-lg p-2 text-gray-400 transition hover:bg-gray-200 hover:text-gray-600"
                                 title="Delete group"
+                                aria-label="Delete group"
                               >
                                 <IconTrash size={16} />
                               </button>
@@ -290,21 +293,23 @@ export default function ProjectDetailPage({
         />
       </div>
 
-      <ProjectModal
-        isOpen={modalState.type === "editProject"}
-        isEdit={true}
-        initialValues={{
-          name: projectName ?? "",
-          description: projectDescription ?? "",
-        }}
-        onSubmit={async (values) => {
-          if (onEditProject) {
-            await onEditProject(values.name, values.description);
-          }
-          handleCloseModal();
-        }}
-        onCancel={handleCloseModal}
-      />
+      {modalState.type === "editProject" && (
+        <ProjectModal
+          isOpen
+          isEdit={true}
+          initialValues={{
+            name: projectName ?? "",
+            description: projectDescription ?? "",
+          }}
+          onSubmit={async (values) => {
+            if (onEditProject) {
+              await onEditProject(values.name, values.description);
+            }
+            handleCloseModal();
+          }}
+          onCancel={handleCloseModal}
+        />
+      )}
 
       <ConfirmModal
         isOpen={modalState.type === "deleteProject"}

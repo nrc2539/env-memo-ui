@@ -62,6 +62,7 @@ export function EnvVariableTable({
                       onClick={() => onEdit(v)}
                       className="rounded-lg p-1.5 text-gray-400 transition hover:bg-gray-200 hover:text-gray-600"
                       title="Edit variable"
+                      aria-label="Edit variable"
                     >
                       <IconEdit size={16} />
                     </button>
@@ -70,6 +71,7 @@ export function EnvVariableTable({
                       onClick={() => onDelete(v)}
                       className="rounded-lg p-1.5 text-gray-400 transition hover:bg-red-100 hover:text-red-500"
                       title="Delete variable"
+                      aria-label="Delete variable"
                     >
                       <IconTrash size={16} />
                     </button>

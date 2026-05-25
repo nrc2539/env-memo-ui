@@ -65,4 +65,36 @@ describe("useProjectEnvAction", () => {
       result.current.deleteEnvVariable(1, "g1", "v1"),
     ).resolves.toBeUndefined();
   });
+
+  it("updateEnvGroup calls PATCH /projects/:id/env-groups/:gid", async () => {
+    const { result } = renderHook(() => useProjectEnvAction(), {
+      wrapper: createWrapper(),
+    });
+    const group = await result.current.updateEnvGroup(1, "g1", "Staging");
+    expect(group.name).toBe("Staging");
+  });
+
+  it("deleteEnvGroup calls DELETE /projects/:id/env-groups/:gid", async () => {
+    const { result } = renderHook(() => useProjectEnvAction(), {
+      wrapper: createWrapper(),
+    });
+    await expect(
+      result.current.deleteEnvGroup(1, "g1"),
+    ).resolves.toBeUndefined();
+  });
+
+  it("updateEnvVariable calls PATCH /projects/:id/env-groups/:gid/variables/:vid", async () => {
+    const { result } = renderHook(() => useProjectEnvAction(), {
+      wrapper: createWrapper(),
+    });
+    const updated = await result.current.updateEnvVariable(
+      1,
+      "g1",
+      "v1",
+      "DB_HOST",
+      "localhost",
+    );
+    expect(updated.key).toBe("DB_HOST");
+    expect(updated.value).toBe("localhost");
+  });
 });

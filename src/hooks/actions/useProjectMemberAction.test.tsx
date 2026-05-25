@@ -61,4 +61,22 @@ describe("useProjectMemberAction", () => {
     expect(response.data).toHaveLength(1);
     expect(response.data[0].email).toBe("invited@example.com");
   });
+
+  it("resendInvitation calls POST /projects/:id/invitations/:iid/resend", async () => {
+    const { result } = renderHook(() => useProjectMemberAction(), {
+      wrapper: createWrapper(),
+    });
+    await expect(
+      result.current.resendInvitation(1, "i1"),
+    ).resolves.toBeUndefined();
+  });
+
+  it("removeInvitation calls DELETE /projects/:id/invitations/:iid", async () => {
+    const { result } = renderHook(() => useProjectMemberAction(), {
+      wrapper: createWrapper(),
+    });
+    await expect(
+      result.current.removeInvitation(1, "i1"),
+    ).resolves.toBeUndefined();
+  });
 });
